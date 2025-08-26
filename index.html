@@ -209,11 +209,14 @@
       position: absolute;
       top: 0;
       left: 0;
+      opacity: 0;
+      z-index: 1;
       transition: opacity 0.5s ease-in-out;
     }
 
     .carousel-item.active {
       opacity: 1;
+      z-index: 2;
     }
 
     .carousel-item .hero-text {
@@ -689,7 +692,7 @@
         <p id="alert-message"></p>
       </div>
       <div class="hero-carousel relative">
-        <div id="carousel-items" class="flex transition-transform duration-500 ease-in-out"></div>
+        <div id="carousel-items" class="flex"></div>
         <button id="prev-btn" class="carousel-nav prev-nav">
           <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="var(--primary-green)" stroke-width="2">
             <path d="M15 18l-6-6 6-6"/>
@@ -786,7 +789,7 @@
       measurementId: "G-V4W97VMSKL"
     };
 
-    mapboxgl.accessToken = 'pk.eyJ1Ijoia2F0bGVnb3BoYXNoYSIsImEiOiJjbTlpOTdzbmYwMGNsMmpzYWJtZzN4d3pqIn0.Zt-aSMEoahrV3zkiVVHbOw'; // Replace with your Mapbox access token
+    mapboxgl.accessToken = 'pk.eyJ1Ijoia2F0bGVnb3BoYXNoYSIsImEiOiJjbTlpOTdzbmYwMGNsMmpzYWJtZzN4d3pqIn0.Zt-aSMEoahrV3zkiVVHbOw';
 
     let app, auth, db;
     let restaurants = [];
@@ -796,7 +799,7 @@
 
     const banners = [
       { image: 'https://i.postimg.cc/DzN43Zc1/img.jpg', text: 'Discover Delicious Meals Near You!' },
-      { image: 'https://via.placeholder.com/1200x200?text=Promo+1', text: 'Get 20% Off Your First Order!' },
+      { image: 'https://i.postimg.cc/m23MqC69/img2.jpg', text: 'Try Our New Dishes Today!' },
       { image: 'https://via.placeholder.com/1200x200?text=Promo+2', text: 'New Restaurants Added!' }
     ];
     let currentBanner = 0;
@@ -848,9 +851,8 @@
       console.log("Alert hidden");
     }
 
-    // Haversine formula to calculate distance between two points (in kilometers)
     function calculateDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371; // Earth's radius in km
+      const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
       const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -936,7 +938,7 @@
     }
 
     function isRestaurantOpen(hours) {
-      if (!hours) return true; // Assume open if no hours provided
+      if (!hours) return true;
       const now = new Date();
       const [open, close] = hours.split('-').map(t => {
         const [h, m] = t.split(':').map(Number);
