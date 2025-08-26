@@ -58,27 +58,64 @@
       max-width: 7xl;
       margin: 0 auto;
       padding: 2rem 1rem;
-      position: relative;
-      overflow: hidden;
+      display: flex;
+      gap: 1.5rem;
     }
 
-    .main-container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
+    .sidebar {
+      width: 250px;
+      background: var(--card-background);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      animation: fadeInLeft 1s ease-out forwards;
+      opacity: 0;
+    }
+
+    .sidebar-tab {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: var(--text-dark);
+      font-weight: 600;
+      border-radius: 8px;
+      background: none;
+      border: none;
+      text-align: left;
       width: 100%;
-      height: 100%;
-      background: url('https://i.postimg.cc/8c3N4Z7Z/food-pattern.png') center/cover no-repeat;
-      opacity: 0.05;
-      z-index: -1;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .sidebar-tab.active {
+      background: var(--highlight);
+      color: var(--primary-green);
+    }
+
+    .sidebar-tab:hover,
+    .sidebar-tab:focus {
+      background: var(--highlight);
+      color: var(--secondary-green);
+      outline: none;
+    }
+
+    .sidebar-tab svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .content {
+      flex: 1;
+      padding: 0 1rem;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
       animation: fadeInUp 1s ease-out 0.5s forwards;
       opacity: 0;
     }
@@ -107,7 +144,7 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-      max-width: 400px;
+      max-width: 500px;
       width: 100%;
     }
 
@@ -143,6 +180,59 @@
     .signout-btn:focus {
       background: var(--highlight);
       border-color: var(--primary-green);
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    .hero-card {
+      width: 100%;
+      height: 200px;
+      background: url('https://images.unsplash.com/photo-1504674900247-0877df9cc926?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: fadeInUp 1s ease-out 0.7s forwards;
+      opacity: 0;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding: 1rem;
+    }
+
+    .hero-text {
+      color: var(--white);
+      font-weight: 700;
+      font-size: 1.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .categories {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-green) var(--white);
+    }
+
+    .category-btn {
+      padding: 0.5rem 1rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .category-btn:hover,
+    .category-btn:focus,
+    .category-btn.active {
+      background: var(--primary-green);
+      color: var(--white);
       transform: scale(1.05);
       outline: none;
     }
@@ -298,6 +388,52 @@
       outline: 2px solid var(--focus-ring);
     }
 
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+      padding: 0.75rem 0;
+      z-index: 10;
+    }
+
+    .nav-items {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      color: var(--text-light);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .nav-item.active {
+      color: var(--primary-green);
+    }
+
+    .nav-item:hover,
+    .nav-item:focus {
+      color: var(--secondary-green);
+      outline: none;
+    }
+
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
     @keyframes pulse {
       0%, 100% { transform: scale(1); opacity: 0.8; }
       50% { transform: scale(1.5); opacity: 0.4; }
@@ -308,39 +444,65 @@
       100% { opacity: 1; transform: translateY(0); }
     }
 
-    @media (max-width: 640px) {
+    @keyframes fadeInLeft {
+      0% { opacity: 0; transform: translateX(-20px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    @media (max-width: 768px) {
       .main-container {
-        padding: 1.5rem 0.5rem;
+        flex-direction: column;
+        padding: 1.5rem 0.5rem 4rem;
+      }
+      .sidebar {
+        display: none;
+      }
+      .mobile-nav {
+        display: block;
+      }
+      .header {
+        flex-direction: row;
+        gap: 0.5rem;
       }
       .header-title {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
       }
       .header-title svg {
-        width: 28px;
-        height: 28px;
+        width: 24px;
+        height: 24px;
       }
       .search-container {
-        flex-direction: column;
+        flex: 1;
         gap: 0.5rem;
       }
       .search-bar {
         max-width: 100%;
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
       }
       .signout-btn {
-        width: 100%;
-        padding: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
       }
-      .dot {
-        width: 10px;
-        height: 10px;
+      .hero-card {
+        height: 150px;
+      }
+      .hero-text {
+        font-size: 1.25rem;
+      }
+      .categories {
+        padding-bottom: 1rem;
       }
       .restaurant-card {
         margin: 0 0.5rem;
       }
+      .restaurant-image {
+        height: 150px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .header, .restaurant-card, .dot {
+      .header, .restaurant-card, .dot, .sidebar, .hero-card {
         animation: none;
       }
     }
@@ -348,40 +510,116 @@
 </head>
 <body>
   <div class="main-container">
-    <div class="header">
-      <h1 class="header-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/>
+    <div class="sidebar">
+      <button class="sidebar-tab active" onclick="switchTab('home')">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
         </svg>
-        Food Delivery
-      </h1>
-      <div class="search-container">
-        <input
-          type="text"
-          id="search-bar"
-          placeholder="Search restaurants..."
-          class="search-bar"
-          aria-label="Search restaurants"
-          oninput="filterRestaurants()"
-        />
-        <button class="signout-btn" onclick="handleSignOut()">Sign Out</button>
+        Home
+      </button>
+      <button class="sidebar-tab" onclick="switchTab('favorites')">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/>
+        </svg>
+        Favorites
+      </button>
+      <button class="sidebar-tab" onclick="switchTab('orders')">
+        <svg viewBox="0 0 24 24">
+          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0021.25 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+        Orders
+      </button>
+    </div>
+    <div class="content">
+      <div class="header">
+        <h1 class="header-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/>
+          </svg>
+          Food Delivery
+        </h1>
+        <div class="search-container">
+          <input
+            type="text"
+            id="search-bar"
+            placeholder="Search restaurants..."
+            class="search-bar"
+            aria-label="Search restaurants"
+            oninput="filterRestaurants()"
+          />
+          <button class="signout-btn" onclick="handleSignOut()">Sign Out</button>
+        </div>
+      </div>
+      <div id="custom-alert" class="custom-alert" role="dialog" aria-hidden="true" aria-labelledby="alert-message">
+        <button class="close-btn" onclick="hideAlert()" aria-label="Close alert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <p id="alert-message"></p>
+      </div>
+      <div class="hero-card">
+        <div class="hero-text">Discover Delicious Meals Near You!</div>
+      </div>
+      <div class="categories">
+        <button class="category-btn active" onclick="filterCategory('all')">All</button>
+        <button class="category-btn" onclick="filterCategory('Pizza')">Pizza</button>
+        <button class="category-btn" onclick="filterCategory('Fast Food')">Fast Food</button>
+        <button class="category-btn" onclick="filterCategory('Burgers')">Burgers</button>
+        <button class="category-btn" onclick="filterCategory('Wings')">Wings</button>
+        <button class="category-btn" onclick="filterCategory('Sushi')">Sushi</button>
+        <button class="category-btn" onclick="filterCategory('Healthy')">Healthy</button>
+        <button class="category-btn" onclick="filterCategory('Seafood')">Seafood</button>
+        <button class="category-btn" onclick="filterCategory('Bakery')">Bakery</button>
+        <button class="category-btn" onclick="filterCategory('Asian')">Asian</button>
+        <button class="category-btn" onclick="filterCategory('Chinese')">Chinese</button>
+        <button class="category-btn" onclick="filterCategory('BBQ')">BBQ</button>
+        <button class="category-btn" onclick="filterCategory('Halal')">Halal</button>
+        <button class="category-btn" onclick="filterCategory('Indian')">Indian</button>
+        <button class="category-btn" onclick="filterCategory('Sandwich')">Sandwich</button>
+        <button class="category-btn" onclick="filterCategory('Breakfast')">Breakfast</button>
+        <button class="category-btn" onclick="filterCategory('Mexican')">Mexican</button>
+        <button class="category-btn" onclick="filterCategory('Soul Food')">Soul Food</button>
+        <button class="category-btn" onclick="filterCategory('Comfort Food')">Comfort Food</button>
+        <button class="category-btn" onclick="filterCategory('American')">American</button>
+        <button class="category-btn" onclick="filterCategory('Coffee')">Coffee</button>
+        <button class="category-btn" onclick="filterCategory('Italian')">Italian</button>
+        <button class="category-btn" onclick="filterCategory('Salads')">Salads</button>
+        <button class="category-btn" onclick="filterCategory('Soup')">Soup</button>
+        <button class="category-btn" onclick="filterCategory('Smoothies')">Smoothies</button>
+        <button class="category-btn" onclick="filterCategory('Korean')">Korean</button>
+        <button class="category-btn" onclick="filterCategory('Japanese')">Japanese</button>
+      </div>
+      <div class="loader active" id="loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div class="restaurant-grid" id="restaurant-grid"></div>
+    </div>
+    <div class="mobile-nav">
+      <div class="nav-items">
+        <div class="nav-item active" onclick="switchTab('home')">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+          </svg>
+          Home
+        </div>
+        <div class="nav-item" onclick="switchTab('favorites')">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/>
+          </svg>
+          Favorites
+        </div>
+        <div class="nav-item" onclick="switchTab('orders')">
+          <svg viewBox="0 0 24 24">
+            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0021.25 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+          </svg>
+          Orders
+        </div>
       </div>
     </div>
-    <div id="custom-alert" class="custom-alert" role="dialog" aria-hidden="true" aria-labelledby="alert-message">
-      <button class="close-btn" onclick="hideAlert()" aria-label="Close alert">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-      <p id="alert-message"></p>
-    </div>
-    <div class="loader active" id="loader">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-    </div>
-    <div class="restaurant-grid" id="restaurant-grid"></div>
   </div>
 
   <script type="module">
@@ -402,6 +640,7 @@
 
     let app, auth, db;
     let restaurants = [];
+    let currentCategory = 'all';
 
     function initializeFirebase() {
       try {
@@ -446,7 +685,7 @@
     function hideAlert() {
       customAlert.classList.remove("active");
       customAlert.setAttribute("aria-hidden", "true");
-      document.querySelector(".main-container").focus();
+      document.querySelector(".content").focus();
       console.log("Alert hidden");
     }
 
@@ -493,9 +732,11 @@
 
     function renderRestaurants() {
       const searchTerm = document.getElementById("search-bar").value.toLowerCase();
-      const filteredRestaurants = restaurants.filter(restaurant =>
-        restaurant.name.toLowerCase().includes(searchTerm)
-      );
+      const filteredRestaurants = restaurants.filter(restaurant => {
+        const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm);
+        const matchesCategory = currentCategory === 'all' || restaurant.cuisine === currentCategory;
+        return matchesSearch && matchesCategory;
+      });
       restaurantGrid.innerHTML = filteredRestaurants.map(restaurant => `
         <div class="restaurant-card">
           <img
@@ -528,9 +769,26 @@
       renderRestaurants();
     };
 
+    window.filterCategory = function (category) {
+      currentCategory = category;
+      document.querySelectorAll(".category-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.textContent === category);
+      });
+      renderRestaurants();
+    };
+
     window.viewMenu = function (restaurantId) {
       showAlert(`View menu for restaurant ID: ${restaurantId}`, true);
       console.log(`Viewing menu for restaurant: ${restaurantId}`);
+    };
+
+    window.switchTab = function (tab) {
+      document.querySelectorAll(".sidebar-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+      document.querySelector(`.sidebar-tab[onclick="switchTab('${tab}')"]`).classList.add("active");
+      document.querySelector(`.nav-item[onclick="switchTab('${tab}')"]`).classList.add("active");
+      showAlert(`Switched to ${tab} tab`, true);
+      console.log(`Switched to ${tab} tab`);
     };
 
     window.handleSignOut = function () {
