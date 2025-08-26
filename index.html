@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Home - Food Delivery</title>
+  <title>Home - My Two Minutes Food</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
@@ -12,8 +12,8 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
   <style>
     :root {
-      --primary-green: #06C167;
-      --secondary-green: #10B981;
+      --primary-orange: #F97316;
+      --secondary-orange: #FB923C;
       --danger-red: #DC2626;
       --text-dark: #111827;
       --text-light: #6B7280;
@@ -26,7 +26,7 @@
       --border-dark: #374151;
       --white-dark: #1F2937;
       --highlight: #F3F4F6;
-      --focus-ring: #10B981;
+      --focus-ring: #F97316;
     }
 
     [data-theme="dark"] {
@@ -98,13 +98,13 @@
 
     .sidebar-tab.active {
       background: var(--highlight);
-      color: var(--primary-green);
+      color: var(--primary-orange);
     }
 
     .sidebar-tab:hover,
     .sidebar-tab:focus {
       background: var(--highlight);
-      color: var(--secondary-green);
+      color: var(--secondary-orange);
       outline: none;
     }
 
@@ -142,7 +142,7 @@
     .header-title svg {
       width: 28px;
       height: 28px;
-      fill: var(--primary-green);
+      fill: var(--primary-orange);
     }
 
     [data-theme="dark"] .header-title {
@@ -169,7 +169,7 @@
 
     .search-bar:focus {
       outline: none;
-      border-color: var(--primary-green);
+      border-color: var(--primary-orange);
       box-shadow: 0 0 0 3px var(--focus-ring);
     }
 
@@ -192,7 +192,7 @@
     .signout-btn:hover,
     .signout-btn:focus {
       background: var(--highlight);
-      border-color: var(--primary-green);
+      border-color: var(--primary-orange);
       transform: scale(1.05);
       outline: none;
     }
@@ -211,7 +211,7 @@
     }
 
     .carousel-item {
-      flex: 0 0 100%;
+      width: 100%;
       height: 100%;
       background-size: cover;
       background-position: center;
@@ -274,7 +274,7 @@
       padding-bottom: 0.5rem;
       scroll-snap-type: x mandatory;
       scrollbar-width: thin;
-      scrollbar-color: var(--primary-green) var(--white);
+      scrollbar-color: var(--primary-orange) var(--white);
       -webkit-overflow-scrolling: touch;
     }
 
@@ -297,7 +297,7 @@
     .category-btn:hover,
     .category-btn:focus,
     .category-btn.active {
-      background: var(--primary-green);
+      background: var(--primary-orange);
       color: var(--white);
       transform: scale(1.05);
       outline: none;
@@ -327,7 +327,7 @@
     .filter-btn:hover,
     .filter-btn:focus,
     .filter-btn.active {
-      background: var(--primary-green);
+      background: var(--primary-orange);
       color: var(--white);
       transform: scale(1.05);
       outline: none;
@@ -347,7 +347,7 @@
     .dot {
       width: 10px;
       height: 10px;
-      background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+      background: linear-gradient(45deg, var(--primary-orange), var(--secondary-orange));
       border-radius: 50%;
       animation: pulse 1.2s ease-in-out infinite;
     }
@@ -386,7 +386,7 @@
       height: 24px;
       background: none;
       border: none;
-      color: var(--primary-green);
+      color: var(--primary-orange);
       cursor: pointer;
       transition: transform 0.2s ease, color 0.2s ease;
     }
@@ -394,7 +394,7 @@
     .custom-alert .close-btn:hover,
     .custom-alert .close-btn:focus {
       transform: scale(1.2);
-      color: var(--secondary-green);
+      color: var(--secondary-orange);
       outline: 2px solid var(--focus-ring);
     }
 
@@ -408,6 +408,24 @@
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 1rem;
       margin-top: 1rem;
+    }
+
+    .no-restaurants {
+      display: none;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      padding: 2rem;
+      margin: 1rem auto;
+      max-width: 90%;
+      background: var(--card-background);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .no-restaurants.active {
+      display: block;
     }
 
     .restaurant-card {
@@ -461,7 +479,7 @@
     .restaurant-info svg {
       width: 14px;
       height: 14px;
-      fill: var(--primary-green);
+      fill: var(--primary-orange);
     }
 
     .popular-item {
@@ -473,7 +491,7 @@
     .add-to-cart-btn {
       width: 100%;
       padding: 0.5rem;
-      background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+      background: linear-gradient(45deg, var(--primary-orange), var(--secondary-orange));
       color: var(--white);
       border: none;
       border-radius: 12px;
@@ -530,7 +548,7 @@
     .view-menu-btn {
       width: 100%;
       padding: 0.5rem;
-      background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+      background: linear-gradient(45deg, var(--primary-orange), var(--secondary-orange));
       color: var(--white);
       border: none;
       border-radius: 12px;
@@ -583,12 +601,12 @@
     }
 
     .nav-item.active {
-      color: var(--primary-green);
+      color: var(--primary-orange);
     }
 
     .nav-item:hover,
     .nav-item:focus {
-      color: var(--secondary-green);
+      color: var(--secondary-orange);
       outline: none;
     }
 
@@ -683,6 +701,10 @@
         gap: 0.75rem;
         margin: 0 0.25rem 1rem;
       }
+      .no-restaurants {
+        font-size: 1.1rem;
+        padding: 1.5rem;
+      }
       .restaurant-image {
         height: 120px;
       }
@@ -760,10 +782,14 @@
       .restaurant-info {
         font-size: 0.75rem;
       }
+      .no-restaurants {
+        font-size: 1rem;
+        padding: 1rem;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .header, .restaurant-card, .dot, .sidebar, .hero-carousel {
+      .header, .restaurant-card, .dot, .sidebar, .hero-carousel, .no-restaurants {
         animation: none;
       }
     }
@@ -797,7 +823,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/>
           </svg>
-          Food Delivery
+          My Two Minutes Food
         </h1>
         <div class="search-container">
           <input
@@ -826,14 +852,14 @@
         <p id="alert-message"></p>
       </div>
       <div class="hero-carousel relative">
-        <div id="carousel-items" class="flex"></div>
+        <div id="carousel-items"></div>
         <button id="prev-btn" class="carousel-nav prev-nav">
-          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="var(--primary-green)" stroke-width="2">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="var(--primary-orange)" stroke-width="2">
             <path d="M15 18l-6-6 6-6"/>
           </svg>
         </button>
         <button id="next-btn" class="carousel-nav next-nav">
-          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="var(--primary-green)" stroke-width="2">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="var(--primary-orange)" stroke-width="2">
             <path d="M9 18l6-6-6-6"/>
           </svg>
         </button>
@@ -880,6 +906,9 @@
         <div class="dot"></div>
         <div class="dot"></div>
         <div class="dot"></div>
+      </div>
+      <div class="no-restaurants" id="no-restaurants">
+        Restaurants coming soon from your area
       </div>
       <div class="restaurant-grid" id="restaurant-grid"></div>
     </div>
@@ -956,6 +985,7 @@
     const alertMessage = document.getElementById("alert-message");
     const loader = document.getElementById("loader");
     const restaurantGrid = document.getElementById("restaurant-grid");
+    const noRestaurants = document.getElementById("no-restaurants");
 
     function showSpinner() {
       loader.classList.add("active");
@@ -1112,54 +1142,61 @@
         return a.name.localeCompare(b.name);
       });
 
-      restaurantGrid.innerHTML = filteredRestaurants.map(restaurant => {
-        const distance = userLocation && restaurant.latitude && restaurant.longitude
-          ? calculateDistance(userLocation.latitude, userLocation.longitude, restaurant.latitude, restaurant.longitude).toFixed(1)
-          : "N/A";
-        return `
-          <div class="restaurant-card">
-            <img
-              src="${restaurant.image || 'https://via.placeholder.com/300x180?text=Delicious+Food'}"
-              alt="${restaurant.name}"
-              class="restaurant-image"
-              onerror="this.src='https://via.placeholder.com/300x180?text=Delicious+Food';"
-            />
-            <div class="restaurant-content">
-              <h2 class="restaurant-name">${restaurant.name}</h2>
-              <p class="restaurant-info">
-                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-                </svg>
-                ${restaurant.cuisine}
-              </p>
-              <p class="restaurant-info">
-                <svg viewBox="0 0 24 24" fill="currentColor">
+      if (filteredRestaurants.length === 0) {
+        restaurantGrid.style.display = 'none';
+        noRestaurants.classList.add('active');
+      } else {
+        restaurantGrid.style.display = 'grid';
+        noRestaurants.classList.remove('active');
+        restaurantGrid.innerHTML = filteredRestaurants.map(restaurant => {
+          const distance = userLocation && restaurant.latitude && restaurant.longitude
+            ? calculateDistance(userLocation.latitude, userLocation.longitude, restaurant.latitude, restaurant.longitude).toFixed(1)
+            : "N/A";
+          return `
+            <div class="restaurant-card">
+              <img
+                src="${restaurant.image || 'https://via.placeholder.com/300x180?text=Delicious+Food'}"
+                alt="${restaurant.name}"
+                class="restaurant-image"
+                onerror="this.src='https://via.placeholder.com/300x180?text=Delicious+Food';"
+              />
+              <div class="restaurant-content">
+                <h2 class="restaurant-name">${restaurant.name}</h2>
+                <p class="restaurant-info">
+                  <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                  </svg>
+                  ${restaurant.cuisine}
+                </p>
+                <p class="restaurant-info">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/>
+                  </svg>
+                  ${restaurant.rating} ★
+                </p>
+                <p class="restaurant-info">
+                  <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                  </svg>
+                  ${distance} km
+                </p>
+                ${restaurant.popularItem ? `
+                  <div class="popular-item">
+                    <p>${restaurant.popularItem.name} - $${restaurant.popularItem.price}</p>
+                    <button class="add-to-cart-btn" onclick="addToCart('${restaurant.id}', '${restaurant.popularItem.name}', ${restaurant.popularItem.price})">Add to Cart</button>
+                  </div>
+                ` : ''}
+                <button class="view-menu-btn" onclick="viewMenu('${restaurant.id}')">View Menu</button>
+              </div>
+              <button class="favorite-btn" onclick="toggleFavorite('${restaurant.id}')">
+                <svg viewBox="0 0 24 24" fill="${restaurant.isFavorite ? 'var(--danger-red)' : 'none'}" stroke="currentColor" stroke-width="2">
                   <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/>
                 </svg>
-                ${restaurant.rating} ★
-              </p>
-              <p class="restaurant-info">
-                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-                </svg>
-                ${distance} km
-              </p>
-              ${restaurant.popularItem ? `
-                <div class="popular-item">
-                  <p>${restaurant.popularItem.name} - $${restaurant.popularItem.price}</p>
-                  <button class="add-to-cart-btn" onclick="addToCart('${restaurant.id}', '${restaurant.popularItem.name}', ${restaurant.popularItem.price})">Add to Cart</button>
-                </div>
-              ` : ''}
-              <button class="view-menu-btn" onclick="viewMenu('${restaurant.id}')">View Menu</button>
+              </button>
             </div>
-            <button class="favorite-btn" onclick="toggleFavorite('${restaurant.id}')">
-              <svg viewBox="0 0 24 24" fill="${restaurant.isFavorite ? 'var(--danger-red)' : 'none'}" stroke="currentColor" stroke-width="2">
-                <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/>
-              </svg>
-            </button>
-          </div>
-        `;
-      }).join("");
+          `;
+        }).join("");
+      }
     }
 
     window.filterRestaurants = function () {
