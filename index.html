@@ -8,6 +8,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
   <style>
     :root {
       --primary-green: #06C167;
@@ -214,6 +216,7 @@
       padding-bottom: 0.5rem;
       scrollbar-width: thin;
       scrollbar-color: var(--primary-green) var(--white);
+      -webkit-overflow-scrolling: touch;
     }
 
     .category-btn {
@@ -638,9 +641,12 @@
       measurementId: "G-V4W97VMSKL"
     };
 
+    mapboxgl.accessToken = 'pk.eyJ1Ijoia2F0bGVnb3BoYXNoYSIsImEiOiJjbTlpOTdzbmYwMGNsMmpzYWJtZzN4d3pqIn0.Zt-aSMEoahrV3zkiVVHbOw'; // Replace with your Mapbox access token
+
     let app, auth, db;
     let restaurants = [];
     let currentCategory = 'all';
+    let userLocation = null;
 
     function initializeFirebase() {
       try {
@@ -689,6 +695,44 @@
       console.log("Alert hidden");
     }
 
+    // Haversine formula to calculate distance between two points (in kilometers)
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Earth's radius in km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    async function getUserLocation() {
+      if (navigator.geolocation) {
+        try {
+          const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+          });
+          userLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          console.log("User location obtained:", userLocation);
+          loadRestaurants();
+        } catch (error) {
+          console.error("Geolocation failed:", error.message);
+          showAlert("Unable to get your location. Showing all restaurants.", false);
+          userLocation = null;
+          loadRestaurants();
+        }
+      } else {
+        console.error("Geolocation not supported by browser");
+        showAlert("Geolocation not supported. Showing all restaurants.", false);
+        userLocation = null;
+        loadRestaurants();
+      }
+    }
+
     async function checkAuthState() {
       showSpinner();
       try {
@@ -696,8 +740,8 @@
         console.log("Persistence set to browserLocalPersistence");
         onAuthStateChanged(auth, (user) => {
           if (user) {
-            console.log("Authenticated user, loading restaurants");
-            loadRestaurants();
+            console.log("Authenticated user, getting location");
+            getUserLocation();
           } else {
             console.log("No authenticated user, redirecting to signup.html");
             document.body.classList.add("fade-out");
@@ -735,9 +779,28 @@
       const filteredRestaurants = restaurants.filter(restaurant => {
         const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm);
         const matchesCategory = currentCategory === 'all' || restaurant.cuisine === currentCategory;
-        return matchesSearch && matchesCategory;
+        let matchesDistance = true;
+        if (userLocation && restaurant.latitude && restaurant.longitude) {
+          const distance = calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            restaurant.latitude,
+            restaurant.longitude
+          );
+          matchesDistance = distance <= 20; // 20 km radius
+        }
+        return matchesSearch && matchesCategory && matchesDistance;
       });
-      restaurantGrid.innerHTML = filteredRestaurants.map(restaurant => `
+      restaurantGrid.innerHTML = filteredRestaurants.map(restaurant => {
+        const distance = userLocation && restaurant.latitude && restaurant.longitude
+          ? calculateDistance(
+              userLocation.latitude,
+              userLocation.longitude,
+              restaurant.latitude,
+              restaurant.longitude
+            ).toFixed(1)
+          : "N/A";
+        return `
         <div class="restaurant-card">
           <img
             src="${restaurant.image || 'https://via.placeholder.com/300x180?text=Delicious+Food'}"
@@ -759,10 +822,16 @@
               </svg>
               ${restaurant.rating} ★
             </p>
+            <p class="restaurant-info">
+              <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+              </svg>
+              ${distance} km
+            </p>
             <button class="view-menu-btn" onclick="viewMenu('${restaurant.id}')">View Menu</button>
           </div>
         </div>
-      `).join("");
+      `}).join("");
     }
 
     window.filterRestaurants = function () {
