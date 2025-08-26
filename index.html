@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - Food Delivery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js"></script>
+  <style>
+    :root {
+      --primary-green: #06C167;
+      --secondary-green: #10B981;
+      --danger-red: #DC2626;
+      --text-dark: #111827;
+      --text-light: #6B7280;
+      --border: #D1D5DB;
+      --white: #FFFFFF;
+      --background: #F9FAFB;
+      --card-background: #fff;
+      --text-dark-dark: #E5E7EB;
+      --text-light-dark: #9CA3AF;
+      --border-dark: #374151;
+      --white-dark: #1F2937;
+      --highlight: #F3F4F6;
+      --focus-ring: #10B981;
+    }
+
+    [data-theme="dark"] {
+      --background: #111827;
+      --text-dark: var(--text-dark-dark);
+      --text-light: var(--text-light-dark);
+      --border: var(--border-dark);
+      --white: var(--white-dark);
+      --card-background: #1F2937;
+      --highlight: #374151;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      transition: opacity 0.5s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    body.fade-out {
+      opacity: 0;
+    }
+
+    .main-container {
+      max-width: 7xl;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .main-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://i.postimg.cc/8c3N4Z7Z/food-pattern.png') center/cover no-repeat;
+      opacity: 0.05;
+      z-index: -1;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      animation: fadeInUp 1s ease-out 0.5s forwards;
+      opacity: 0;
+    }
+
+    .header-title {
+      color: var(--text-dark);
+      font-weight: 800;
+      font-size: 2rem;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-title svg {
+      width: 36px;
+      height: 36px;
+      fill: var(--primary-green);
+    }
+
+    [data-theme="dark"] .header-title {
+      color: var(--text-dark-dark);
+    }
+
+    .search-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .search-bar {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--text-dark);
+      font-size: 0.95rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .search-bar:focus {
+      outline: none;
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+
+    .signout-btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .signout-btn:hover,
+    .signout-btn:focus {
+      background: var(--highlight);
+      border-color: var(--primary-green);
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    .loader {
+      display: none;
+      gap: 8px;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+
+    .loader.active {
+      display: flex;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+      border-radius: 50%;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    .custom-alert {
+      display: none;
+      background: var(--card-background);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--danger-red);
+      color: var(--danger-red);
+      margin: 1rem auto;
+      text-align: center;
+      font-weight: 500;
+      animation: fadeIn 0.3s ease-out forwards;
+      max-width: 400px;
+    }
+
+    .custom-alert.active {
+      display: block;
+    }
+
+    .custom-alert .close-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      width: 24px;
+      height: 24px;
+      background: none;
+      border: none;
+      color: var(--primary-green);
+      cursor: pointer;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .custom-alert .close-btn:hover,
+    .custom-alert .close-btn:focus {
+      transform: scale(1.2);
+      color: var(--secondary-green);
+      outline: 2px solid var(--focus-ring);
+    }
+
+    .custom-alert .close-btn svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .restaurant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .restaurant-card {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      animation: fadeInUp 1s ease-out forwards;
+      opacity: 0;
+      position: relative;
+    }
+
+    .restaurant-card:nth-child(1) { animation-delay: 0.1s; }
+    .restaurant-card:nth-child(2) { animation-delay: 0.2s; }
+    .restaurant-card:nth-child(3) { animation-delay: 0.3s; }
+    .restaurant-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .restaurant-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .restaurant-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .restaurant-content {
+      padding: 1rem;
+    }
+
+    .restaurant-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    .restaurant-info {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .restaurant-info svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--primary-green);
+    }
+
+    .view-menu-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      margin-top: 0.75rem;
+    }
+
+    .view-menu-btn:hover,
+    .view-menu-btn:focus {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      outline: 2px solid var(--focus-ring);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.5); opacity: 0.4; }
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      .main-container {
+        padding: 1.5rem 0.5rem;
+      }
+      .header-title {
+        font-size: 1.5rem;
+      }
+      .header-title svg {
+        width: 28px;
+        height: 28px;
+      }
+      .search-container {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .search-bar {
+        max-width: 100%;
+      }
+      .signout-btn {
+        width: 100%;
+        padding: 0.5rem;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+      }
+      .restaurant-card {
+        margin: 0 0.5rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .header, .restaurant-card, .dot {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="header">
+      <h1 class="header-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/>
+        </svg>
+        Food Delivery
+      </h1>
+      <div class="search-container">
+        <input
+          type="text"
+          id="search-bar"
+          placeholder="Search restaurants..."
+          class="search-bar"
+          aria-label="Search restaurants"
+          oninput="filterRestaurants()"
+        />
+        <button class="signout-btn" onclick="handleSignOut()">Sign Out</button>
+      </div>
+    </div>
+    <div id="custom-alert" class="custom-alert" role="dialog" aria-hidden="true" aria-labelledby="alert-message">
+      <button class="close-btn" onclick="hideAlert()" aria-label="Close alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <p id="alert-message"></p>
+    </div>
+    <div class="loader active" id="loader">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="restaurant-grid" id="restaurant-grid"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
+      authDomain: "fire-b-a8878.firebaseapp.com",
+      databaseURL: "https://fire-b-a8878.firebaseio.com",
+      projectId: "fire-b-a8878",
+      storageBucket: "fire-b-a8878.firebasestorage.app",
+      messagingSenderId: "658673187627",
+      appId: "1:658673187627:web:6e4c29af661785f0afa36e",
+      measurementId: "G-V4W97VMSKL"
+    };
+
+    let app, auth, db;
+    let restaurants = [];
+
+    function initializeFirebase() {
+      try {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getDatabase(app);
+        console.log("Firebase initialized successfully at", new Date().toLocaleString());
+        checkAuthState();
+      } catch (error) {
+        console.error("Firebase initialization failed:", error.code, error.message);
+        showAlert("Failed to connect to Firebase. Please check your network.", false);
+        hideSpinner();
+      }
+    }
+
+    const customAlert = document.getElementById("custom-alert");
+    const alertMessage = document.getElementById("alert-message");
+    const loader = document.getElementById("loader");
+    const restaurantGrid = document.getElementById("restaurant-grid");
+
+    function showSpinner() {
+      loader.classList.add("active");
+      console.log("Spinner shown at", new Date().toLocaleString());
+    }
+
+    function hideSpinner() {
+      loader.classList.remove("active");
+      console.log("Spinner hidden at", new Date().toLocaleString());
+    }
+
+    function showAlert(message, autoHide = true) {
+      alertMessage.textContent = message;
+      customAlert.classList.add("active");
+      customAlert.setAttribute("aria-hidden", "false");
+      document.querySelector(".close-btn").focus();
+      console.log("Alert shown:", message);
+      if (autoHide) {
+        setTimeout(hideAlert, 5000);
+      }
+    }
+
+    function hideAlert() {
+      customAlert.classList.remove("active");
+      customAlert.setAttribute("aria-hidden", "true");
+      document.querySelector(".main-container").focus();
+      console.log("Alert hidden");
+    }
+
+    async function checkAuthState() {
+      showSpinner();
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+        console.log("Persistence set to browserLocalPersistence");
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            console.log("Authenticated user, loading restaurants");
+            loadRestaurants();
+          } else {
+            console.log("No authenticated user, redirecting to signup.html");
+            document.body.classList.add("fade-out");
+            setTimeout(() => {
+              window.location.href = "signup.html";
+            }, 1500);
+          }
+        });
+      } catch (error) {
+        console.error("Auth state check failed:", error.code, error.message);
+        showAlert("Failed to check authentication state. Please try again.", false);
+        hideSpinner();
+      }
+    }
+
+    function loadRestaurants() {
+      const restaurantsRef = ref(db, "restaurants");
+      onValue(restaurantsRef, (snapshot) => {
+        restaurants = [];
+        const data = snapshot.val();
+        if (data) {
+          restaurants = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+        }
+        renderRestaurants();
+        hideSpinner();
+      }, (error) => {
+        console.error("Failed to load restaurants:", error.code, error.message);
+        showAlert("Failed to load restaurants. Please try again.", false);
+        hideSpinner();
+      });
+    }
+
+    function renderRestaurants() {
+      const searchTerm = document.getElementById("search-bar").value.toLowerCase();
+      const filteredRestaurants = restaurants.filter(restaurant =>
+        restaurant.name.toLowerCase().includes(searchTerm)
+      );
+      restaurantGrid.innerHTML = filteredRestaurants.map(restaurant => `
+        <div class="restaurant-card">
+          <img
+            src="${restaurant.image || 'https://via.placeholder.com/300x180?text=Delicious+Food'}"
+            alt="${restaurant.name}"
+            class="restaurant-image"
+            onerror="this.src='https://via.placeholder.com/300x180?text=Delicious+Food';"
+          />
+          <div class="restaurant-content">
+            <h2 class="restaurant-name">${restaurant.name}</h2>
+            <p class="restaurant-info">
+              <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+              </svg>
+              ${restaurant.cuisine}
+            </p>
+            <p class="restaurant-info">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/>
+              </svg>
+              ${restaurant.rating} ★
+            </p>
+            <button class="view-menu-btn" onclick="viewMenu('${restaurant.id}')">View Menu</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    window.filterRestaurants = function () {
+      renderRestaurants();
+    };
+
+    window.viewMenu = function (restaurantId) {
+      showAlert(`View menu for restaurant ID: ${restaurantId}`, true);
+      console.log(`Viewing menu for restaurant: ${restaurantId}`);
+    };
+
+    window.handleSignOut = function () {
+      signOut(auth).then(() => {
+        console.log("Sign out successful, redirecting to signup.html");
+        document.body.classList.add("fade-out");
+        setTimeout(() => {
+          window.location.href = "signup.html";
+        }, 1500);
+      }).catch((error) => {
+        console.error("Sign out failed:", error.code, error.message);
+        showAlert("Failed to sign out. Please try again.", false);
+      });
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("DOMContentLoaded event fired at", new Date().toLocaleString());
+      const savedTheme = localStorage.getItem("theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      console.log("Initial theme set to:", savedTheme);
+      initializeFirebase();
+    });
+  </script>
+</body>
+</html>
