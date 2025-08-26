@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Food Delivery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
+  <style>
+    :root {
+      --primary-green: #06C167;
+      --secondary-green: #10B981;
+      --danger-red: #DC2626;
+      --text-dark: #111827;
+      --text-light: #6B7280;
+      --border: #D1D5DB;
+      --white: #FFFFFF;
+      --background: #F9FAFB;
+      --card-background: #fff;
+      --text-dark-dark: #E5E7EB;
+      --text-light-dark: #9CA3AF;
+      --border-dark: #374151;
+      --white-dark: #1F2937;
+      --highlight: #F3F4F6;
+      --focus-ring: #10B981;
+    }
+
+    [data-theme="dark"] {
+      --background: #111827;
+      --text-dark: var(--text-dark-dark);
+      --text-light: var(--text-light-dark);
+      --border: var(--border-dark);
+      --white: var(--white-dark);
+      --card-background: #1F2937;
+      --highlight: #374151;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      transition: opacity 0.5s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    body.fade-out {
+      opacity: 0;
+    }
+
+    .auth-container {
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      padding: 2rem;
+      background: var(--card-background);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border);
+      animation: fadeInScale 1.2s ease-out forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://i.postimg.cc/8c3N4Z7Z/food-pattern.png') center/cover no-repeat;
+      opacity: 0.05;
+      z-index: -1;
+    }
+
+    .auth-title {
+      color: var(--text-dark);
+      font-weight: 700;
+      font-size: 1.75rem;
+      letter-spacing: 0.5px;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 1s ease-out 0.5s forwards;
+      opacity: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .auth-title svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    [data-theme="dark"] .auth-title {
+      color: var(--text-dark-dark);
+    }
+
+    .tab-container {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 0.75rem;
+      background: none;
+      border: none;
+      font-weight: 600;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+
+    .tab.active {
+      color: var(--primary-green);
+      border-bottom: 3px solid var(--primary-green);
+    }
+
+    .tab:hover,
+    .tab:focus {
+      color: var(--secondary-green);
+      outline: none;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .loader {
+      display: none;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .loader.active {
+      display: flex;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+      border-radius: 50%;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    .custom-alert {
+      display: none;
+      background: var(--card-background);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--danger-red);
+      color: var(--danger-red);
+      margin-bottom: 1rem;
+      text-align: center;
+      font-weight: 500;
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    .custom-alert.active {
+      display: block;
+    }
+
+    .custom-alert .close-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      width: 24px;
+      height: 24px;
+      background: none;
+      border: none;
+      color: var(--primary-green);
+      cursor: pointer;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .custom-alert .close-btn:hover,
+    .custom-alert .close-btn:focus {
+      transform: scale(1.2);
+      color: var(--secondary-green);
+      outline: 2px solid var(--focus-ring);
+    }
+
+    .custom-alert .close-btn svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .auth-btn, .google-btn {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+      color: var(--white);
+      border: none;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .auth-btn:hover,
+    .auth-btn:focus,
+    .google-btn:hover,
+    .google-btn:focus {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      outline: 2px solid var(--focus-ring);
+    }
+
+    .auth-btn:disabled,
+    .google-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .google-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.5); opacity: 0.4; }
+    }
+
+    @keyframes fadeInScale {
+      0% { opacity: 0; transform: scale(0.7); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      .auth-container {
+        padding: 1.5rem;
+      }
+      .auth-title {
+        font-size: 1.25rem;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+      }
+      .tab {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .auth-container, .auth-title, .dot {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <h2 class="auth-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/>
+      </svg>
+      Food Delivery
+    </h2>
+    <div class="tab-container">
+      <button class="tab active" onclick="showTab('signup')">Sign Up</button>
+      <button class="tab" onclick="showTab('signin')">Sign In</button>
+    </div>
+    <div id="custom-alert" class="custom-alert" role="dialog" aria-hidden="true" aria-labelledby="alert-message">
+      <button class="close-btn" onclick="hideAlert()" aria-label="Close alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <p id="alert-message"></p>
+    </div>
+    <div id="signup" class="tab-content active">
+      <div class="mb-4">
+        <input
+          type="email"
+          id="signup-email"
+          placeholder="Email"
+          class="w-full px-4 py-2 rounded-lg border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+          aria-label="Email"
+        />
+      </div>
+      <div class="mb-4">
+        <input
+          type="password"
+          id="signup-password"
+          placeholder="Password"
+          class="w-full px-4 py-2 rounded-lg border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+          aria-label="Password"
+        />
+      </div>
+      <div class="loader" id="signup-loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <button class="auth-btn" id="signup-btn" onclick="handleAuth(true)">Sign Up</button>
+    </div>
+    <div id="signin" class="tab-content">
+      <div class="mb-4">
+        <input
+          type="email"
+          id="signin-email"
+          placeholder="Email"
+          class="w-full px-4 py-2 rounded-lg border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+          aria-label="Email"
+        />
+      </div>
+      <div class="mb-4">
+        <input
+          type="password"
+          id="signin-password"
+          placeholder="Password"
+          class="w-full px-4 py-2 rounded-lg border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+          aria-label="Password"
+        />
+      </div>
+      <div class="loader" id="signin-loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <button class="auth-btn" id="signin-btn" onclick="handleAuth(false)">Sign In</button>
+    </div>
+    <button class="google-btn mt-4" id="google-btn" onclick="handleGoogleSignIn()">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      Sign in with Google
+    </button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
+      authDomain: "fire-b-a8878.firebaseapp.com",
+      databaseURL: "https://fire-b-a8878.firebaseio.com",
+      projectId: "fire-b-a8878",
+      storageBucket: "fire-b-a8878.firebasestorage.app",
+      messagingSenderId: "658673187627",
+      appId: "1:658673187627:web:6e4c29af661785f0afa36e",
+      measurementId: "G-V4W97VMSKL"
+    };
+
+    let app, auth;
+
+    function initializeFirebase() {
+      try {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        console.log("Firebase initialized successfully at", new Date().toLocaleString());
+        checkAuthState();
+      } catch (error) {
+        console.error("Firebase initialization failed:", error.code, error.message);
+        showAlert("Failed to connect to Firebase. Please check your network.", false);
+      }
+    }
+
+    const customAlert = document.getElementById("custom-alert");
+    const alertMessage = document.getElementById("alert-message");
+    const signupLoader = document.getElementById("signup-loader");
+    const signinLoader = document.getElementById("signin-loader");
+    const signupBtn = document.getElementById("signup-btn");
+    const signinBtn = document.getElementById("signin-btn");
+    const googleBtn = document.getElementById("google-btn");
+
+    function showSpinner(isSignUp) {
+      const loader = isSignUp ? signupLoader : signinLoader;
+      loader.classList.add("active");
+      signupBtn.disabled = true;
+      signinBtn.disabled = true;
+      googleBtn.disabled = true;
+      console.log("Spinner shown at", new Date().toLocaleString());
+    }
+
+    function hideSpinner() {
+      signupLoader.classList.remove("active");
+      signinLoader.classList.remove("active");
+      signupBtn.disabled = false;
+      signinBtn.disabled = false;
+      googleBtn.disabled = false;
+      console.log("Spinner hidden at", new Date().toLocaleString());
+    }
+
+    function showAlert(message, autoHide = true) {
+      alertMessage.textContent = message;
+      customAlert.classList.add("active");
+      customAlert.setAttribute("aria-hidden", "false");
+      document.querySelector(".close-btn").focus();
+      console.log("Alert shown:", message);
+      if (autoHide) {
+        setTimeout(hideAlert, 5000);
+      }
+    }
+
+    function hideAlert() {
+      customAlert.classList.remove("active");
+      customAlert.setAttribute("aria-hidden", "true");
+      document.querySelector(".auth-container").focus();
+      console.log("Alert hidden");
+    }
+
+    function showTab(tabId) {
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
+      document.querySelector(`button[onclick="showTab('${tabId}')"]`).classList.add("active");
+      document.getElementById(tabId).classList.add("active");
+      document.getElementById(`${tabId}-email`).value = "";
+      document.getElementById(`${tabId}-password`).value = "";
+      hideAlert();
+    }
+
+    async function checkAuthState() {
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+        console.log("Persistence set to browserLocalPersistence");
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            console.log("Authenticated user, redirecting to index.html");
+            document.body.classList.add("fade-out");
+            setTimeout(() => {
+              window.location.href = "index.html";
+            }, 1500);
+          }
+        });
+      } catch (error) {
+        console.error("Auth state check failed:", error.code, error.message);
+        showAlert("Failed to check authentication state. Please try again.", false);
+      }
+    }
+
+    window.handleAuth = async function (isSignUp) {
+      const email = document.getElementById(`${isSignUp ? "signup" : "signin"}-email`).value;
+      const password = document.getElementById(`${isSignUp ? "signup" : "signin"}-password`).value;
+      showSpinner(isSignUp);
+      try {
+        if (isSignUp) {
+          await createUserWithEmailAndPassword(auth, email, password);
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+        }
+        console.log(`${isSignUp ? "Sign Up" : "Sign In"} successful, redirecting to index.html`);
+        document.body.classList.add("fade-out");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1500);
+      } catch (error) {
+        let message = "An error occurred. Please try again.";
+        if (error.code === "auth/email-already-in-use") {
+          message = "Email already in use. Try signing in.";
+        } else if (error.code === "auth/invalid-email") {
+          message = "Invalid email address.";
+        } else if (error.code === "auth/weak-password") {
+          message = "Password must be at least 6 characters.";
+        } else if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+          message = "Invalid email or password.";
+        }
+        showAlert(message, false);
+        hideSpinner();
+        console.error(`${isSignUp ? "Sign Up" : "Sign In"} failed:`, error.code, error.message);
+      }
+    };
+
+    window.handleGoogleSignIn = async function () {
+      showSpinner(true);
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+        console.log("Google Sign-In successful, redirecting to index.html");
+        document.body.classList.add("fade-out");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1500);
+      } catch (error) {
+        let message = "Google Sign-In failed. Please try again.";
+        if (error.code === "auth/popup-closed-by-user") {
+          message = "Sign-In cancelled. Please try again.";
+        } else if (error.code === "auth/network-request-failed") {
+          message = "Network error. Please check your connection.";
+        }
+        showAlert(message, false);
+        hideSpinner();
+        console.error("Google Sign-In failed:", error.code, error.message);
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("DOMContentLoaded event fired at", new Date().toLocaleString());
+      const savedTheme = localStorage.getItem("theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      console.log("Initial theme set to:", savedTheme);
+      initializeFirebase();
+    });
+  </script>
+</body>
+</html>
