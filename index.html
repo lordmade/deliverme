@@ -186,26 +186,64 @@
       outline: none;
     }
 
-    .hero-card {
+    .hero-carousel {
       width: 100%;
       height: 200px;
-      background: url('https://i.postimg.cc/DzN43Zc1/img.jpg') center/cover no-repeat;
       border-radius: 16px;
       margin-bottom: 1.5rem;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       animation: fadeInUp 1s ease-out 0.7s forwards;
       opacity: 0;
       position: relative;
+      overflow: hidden;
+    }
+
+    .carousel-item {
+      flex: 0 0 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
       display: flex;
       align-items: flex-end;
       padding: 1rem;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: opacity 0.5s ease-in-out;
     }
 
-    .hero-text {
+    .carousel-item.active {
+      opacity: 1;
+    }
+
+    .carousel-item .hero-text {
       color: var(--white);
       font-weight: 700;
       font-size: 1.5rem;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .carousel-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--white);
+      border-radius: 50%;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .carousel-nav:hover {
+      background: var(--highlight);
+    }
+
+    .prev-nav {
+      left: 1rem;
+    }
+
+    .next-nav {
+      right: 1rem;
     }
 
     .categories {
@@ -234,6 +272,32 @@
     .category-btn:hover,
     .category-btn:focus,
     .category-btn.active {
+      background: var(--primary-green);
+      color: var(--white);
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    .sort-filter-container {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .filter-btn:hover,
+    .filter-btn:focus,
+    .filter-btn.active {
       background: var(--primary-green);
       color: var(--white);
       transform: scale(1.05);
@@ -371,6 +435,63 @@
       fill: var(--primary-green);
     }
 
+    .popular-item {
+      margin-top: 0.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 0.5rem;
+    }
+
+    .add-to-cart-btn {
+      width: 100%;
+      padding: 0.5rem;
+      background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      margin-top: 0.5rem;
+    }
+
+    .add-to-cart-btn:hover,
+    .add-to-cart-btn:focus {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      outline: 2px solid var(--focus-ring);
+    }
+
+    .favorite-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      padding: 0.5rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .favorite-btn:hover,
+    .favorite-btn:focus {
+      background: var(--highlight);
+      transform: scale(1.1);
+      outline: none;
+    }
+
+    .favorite-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+    }
+
+    .favorite-btn.favorited svg {
+      fill: var(--danger-red);
+      stroke: none;
+    }
+
     .view-menu-btn {
       width: 100%;
       padding: 0.75rem;
@@ -487,10 +608,10 @@
         padding: 0.5rem 1rem;
         font-size: 0.85rem;
       }
-      .hero-card {
+      .hero-carousel {
         height: 150px;
       }
-      .hero-text {
+      .carousel-item .hero-text {
         font-size: 1.25rem;
       }
       .categories {
@@ -505,7 +626,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .header, .restaurant-card, .dot, .sidebar, .hero-card {
+      .header, .restaurant-card, .dot, .sidebar, .hero-carousel {
         animation: none;
       }
     }
@@ -550,6 +671,11 @@
             aria-label="Search restaurants"
             oninput="filterRestaurants()"
           />
+          <button id="theme-toggle" class="signout-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+            <svg id="theme-icon" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+          </button>
           <button class="signout-btn" onclick="handleSignOut()">Sign Out</button>
         </div>
       </div>
@@ -562,8 +688,18 @@
         </button>
         <p id="alert-message"></p>
       </div>
-      <div class="hero-card">
-        <div class="hero-text">Discover Delicious Meals Near You!</div>
+      <div class="hero-carousel relative">
+        <div id="carousel-items" class="flex transition-transform duration-500 ease-in-out"></div>
+        <button id="prev-btn" class="carousel-nav prev-nav">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="var(--primary-green)" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <button id="next-btn" class="carousel-nav next-nav">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="var(--primary-green)" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
       </div>
       <div class="categories">
         <button class="category-btn active" onclick="filterCategory('all')">All</button>
@@ -573,16 +709,35 @@
         <button class="category-btn" onclick="filterCategory('Wings')">Wings</button>
         <button class="category-btn" onclick="filterCategory('Sushi')">Sushi</button>
         <button class="category-btn" onclick="filterCategory('Healthy')">Healthy</button>
+        <button class="category-btn" onclick="filterCategory('Seafood')">Seafood</button>
         <button class="category-btn" onclick="filterCategory('Bakery')">Bakery</button>
+        <button class="category-btn" onclick="filterCategory('Asian')">Asian</button>
+        <button class="category-btn" onclick="filterCategory('Chinese')">Chinese</button>
         <button class="category-btn" onclick="filterCategory('BBQ')">BBQ</button>
         <button class="category-btn" onclick="filterCategory('Halal')">Halal</button>
         <button class="category-btn" onclick="filterCategory('Indian')">Indian</button>
         <button class="category-btn" onclick="filterCategory('Sandwich')">Sandwich</button>
         <button class="category-btn" onclick="filterCategory('Breakfast')">Breakfast</button>
+        <button class="category-btn" onclick="filterCategory('Mexican')">Mexican</button>
         <button class="category-btn" onclick="filterCategory('Soul Food')">Soul Food</button>
+        <button class="category-btn" onclick="filterCategory('Comfort Food')">Comfort Food</button>
+        <button class="category-btn" onclick="filterCategory('American')">American</button>
         <button class="category-btn" onclick="filterCategory('Coffee')">Coffee</button>
+        <button class="category-btn" onclick="filterCategory('Italian')">Italian</button>
         <button class="category-btn" onclick="filterCategory('Salads')">Salads</button>
         <button class="category-btn" onclick="filterCategory('Soup')">Soup</button>
+        <button class="category-btn" onclick="filterCategory('Smoothies')">Smoothies</button>
+        <button class="category-btn" onclick="filterCategory('Korean')">Korean</button>
+        <button class="category-btn" onclick="filterCategory('Japanese')">Japanese</button>
+      </div>
+      <div class="sort-filter-container">
+        <select id="sort-by" onchange="sortRestaurants()" class="search-bar">
+          <option value="name">Sort by Name</option>
+          <option value="rating">Sort by Rating</option>
+          <option value="distance">Sort by Distance</option>
+        </select>
+        <button id="open-now-filter" class="filter-btn" onclick="toggleFilter('openNow')">Open Now</button>
+        <button id="fast-delivery-filter" class="filter-btn" onclick="toggleFilter('fastDelivery')">Fast Delivery</button>
       </div>
       <div class="loader active" id="loader">
         <div class="dot"></div>
@@ -618,7 +773,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getDatabase, ref, onValue, set, get, remove, push } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
@@ -637,6 +792,14 @@
     let restaurants = [];
     let currentCategory = 'all';
     let userLocation = null;
+    let filters = { openNow: false, fastDelivery: false };
+
+    const banners = [
+      { image: 'https://i.postimg.cc/DzN43Zc1/img.jpg', text: 'Discover Delicious Meals Near You!' },
+      { image: 'https://via.placeholder.com/1200x200?text=Promo+1', text: 'Get 20% Off Your First Order!' },
+      { image: 'https://via.placeholder.com/1200x200?text=Promo+2', text: 'New Restaurants Added!' }
+    ];
+    let currentBanner = 0;
 
     function initializeFirebase() {
       try {
@@ -747,13 +910,21 @@
       }
     }
 
-    function loadRestaurants() {
+    async function loadRestaurants() {
       const restaurantsRef = ref(db, "restaurants");
-      onValue(restaurantsRef, (snapshot) => {
+      onValue(restaurantsRef, async (snapshot) => {
         restaurants = [];
         const data = snapshot.val();
         if (data) {
-          restaurants = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+          restaurants = Object.keys(data).map(key => ({ id: key, ...data[key], isFavorite: false }));
+          if (auth.currentUser) {
+            const favoritesRef = ref(db, `users/${auth.currentUser.uid}/favorites`);
+            const favoritesSnapshot = await get(favoritesRef);
+            const favorites = favoritesSnapshot.val() || {};
+            restaurants.forEach(r => {
+              r.isFavorite = !!favorites[r.id];
+            });
+          }
         }
         renderRestaurants();
         hideSpinner();
@@ -764,9 +935,20 @@
       });
     }
 
+    function isRestaurantOpen(hours) {
+      if (!hours) return true; // Assume open if no hours provided
+      const now = new Date();
+      const [open, close] = hours.split('-').map(t => {
+        const [h, m] = t.split(':').map(Number);
+        return new Date().setHours(h, m, 0, 0);
+      });
+      return now >= open && now <= close;
+    }
+
     function renderRestaurants() {
       const searchTerm = document.getElementById("search-bar").value.toLowerCase();
-      const filteredRestaurants = restaurants.filter(restaurant => {
+      const sortBy = document.getElementById("sort-by").value;
+      let filteredRestaurants = restaurants.filter(restaurant => {
         const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm);
         const matchesCategory = currentCategory === 'all' || restaurant.cuisine === currentCategory;
         let matchesDistance = true;
@@ -777,51 +959,71 @@
             restaurant.latitude,
             restaurant.longitude
           );
-          matchesDistance = distance <= 20; // 20 km radius
+          matchesDistance = distance <= 20;
         }
-        return matchesSearch && matchesCategory && matchesDistance;
+        const matchesOpenNow = !filters.openNow || isRestaurantOpen(restaurant.openHours);
+        const matchesFastDelivery = !filters.fastDelivery || (restaurant.deliveryTime && restaurant.deliveryTime <= 30);
+        return matchesSearch && matchesCategory && matchesDistance && matchesOpenNow && matchesFastDelivery;
       });
+
+      filteredRestaurants.sort((a, b) => {
+        if (sortBy === 'rating') return b.rating - a.rating;
+        if (sortBy === 'distance' && userLocation) {
+          const distA = calculateDistance(userLocation.latitude, userLocation.longitude, a.latitude, a.longitude);
+          const distB = calculateDistance(userLocation.latitude, userLocation.longitude, b.latitude, b.longitude);
+          return distA - distB;
+        }
+        return a.name.localeCompare(b.name);
+      });
+
       restaurantGrid.innerHTML = filteredRestaurants.map(restaurant => {
         const distance = userLocation && restaurant.latitude && restaurant.longitude
-          ? calculateDistance(
-              userLocation.latitude,
-              userLocation.longitude,
-              restaurant.latitude,
-              restaurant.longitude
-            ).toFixed(1)
+          ? calculateDistance(userLocation.latitude, userLocation.longitude, restaurant.latitude, restaurant.longitude).toFixed(1)
           : "N/A";
         return `
-        <div class="restaurant-card">
-          <img
-            src="${restaurant.image || 'https://via.placeholder.com/300x180?text=Delicious+Food'}"
-            alt="${restaurant.name}"
-            class="restaurant-image"
-            onerror="this.src='https://via.placeholder.com/300x180?text=Delicious+Food';"
-          />
-          <div class="restaurant-content">
-            <h2 class="restaurant-name">${restaurant.name}</h2>
-            <p class="restaurant-info">
-              <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-              </svg>
-              ${restaurant.cuisine}
-            </p>
-            <p class="restaurant-info">
-              <svg viewBox="0 0 24 24" fill="currentColor">
+          <div class="restaurant-card">
+            <img
+              src="${restaurant.image || 'https://via.placeholder.com/300x180?text=Delicious+Food'}"
+              alt="${restaurant.name}"
+              class="restaurant-image"
+              onerror="this.src='https://via.placeholder.com/300x180?text=Delicious+Food';"
+            />
+            <div class="restaurant-content">
+              <h2 class="restaurant-name">${restaurant.name}</h2>
+              <p class="restaurant-info">
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                </svg>
+                ${restaurant.cuisine}
+              </p>
+              <p class="restaurant-info">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/>
+                </svg>
+                ${restaurant.rating} ★
+              </p>
+              <p class="restaurant-info">
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                </svg>
+                ${distance} km
+              </p>
+              ${restaurant.popularItem ? `
+                <div class="popular-item">
+                  <p>${restaurant.popularItem.name} - $${restaurant.popularItem.price}</p>
+                  <button class="add-to-cart-btn" onclick="addToCart('${restaurant.id}', '${restaurant.popularItem.name}', ${restaurant.popularItem.price})">Add to Cart</button>
+                </div>
+              ` : ''}
+              <button class="view-menu-btn" onclick="viewMenu('${restaurant.id}')">View Menu</button>
+            </div>
+            <button class="favorite-btn" onclick="toggleFavorite('${restaurant.id}')">
+              <svg viewBox="0 0 24 24" fill="${restaurant.isFavorite ? 'var(--danger-red)' : 'none'}" stroke="currentColor" stroke-width="2">
                 <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/>
               </svg>
-              ${restaurant.rating} ★
-            </p>
-            <p class="restaurant-info">
-              <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-              </svg>
-              ${distance} km
-            </p>
-            <button class="view-menu-btn" onclick="viewMenu('${restaurant.id}')">View Menu</button>
+            </button>
           </div>
-        </div>
-      `}).join("");
+        `;
+      }).join("");
     }
 
     window.filterRestaurants = function () {
@@ -833,6 +1035,16 @@
       document.querySelectorAll(".category-btn").forEach(btn => {
         btn.classList.toggle("active", btn.textContent === category);
       });
+      renderRestaurants();
+    };
+
+    window.sortRestaurants = function () {
+      renderRestaurants();
+    };
+
+    window.toggleFilter = function (filter) {
+      filters[filter] = !filters[filter];
+      document.getElementById(`${filter}-filter`).classList.toggle('active', filters[filter]);
       renderRestaurants();
     };
 
@@ -850,25 +1062,88 @@
       console.log(`Switched to ${tab} tab`);
     };
 
-    window.handleSignOut = function () {
-      signOut(auth).then(() => {
-        console.log("Sign out successful, redirecting to signup.html");
-        document.body.classList.add("fade-out");
-        setTimeout(() => {
-          window.location.href = "signup.html";
-        }, 1500);
-      }).catch((error) => {
-        console.error("Sign out failed:", error.code, error.message);
-        showAlert("Failed to sign out. Please try again.", false);
-      });
+    window.toggleFavorite = async function(restaurantId) {
+      const user = auth.currentUser;
+      if (!user) {
+        showAlert("Please sign in to favorite restaurants.", false);
+        return;
+      }
+      const favoriteRef = ref(db, `users/${user.uid}/favorites/${restaurantId}`);
+      const snapshot = await get(favoriteRef);
+      const isFavorited = snapshot.exists();
+      if (isFavorited) {
+        remove(favoriteRef).then(() => {
+          showAlert("Removed from favorites!", true);
+          restaurants.find(r => r.id === restaurantId).isFavorite = false;
+          renderRestaurants();
+        });
+      } else {
+        set(favoriteRef, true).then(() => {
+          showAlert("Added to favorites!", true);
+          restaurants.find(r => r.id === restaurantId).isFavorite = true;
+          renderRestaurants();
+        });
+      }
     };
 
-    document.addEventListener("DOMContentLoaded", () => {
+    window.addToCart = function(restaurantId, itemName, price) {
+      const user = auth.currentUser;
+      if (!user) {
+        showAlert("Please sign in to add items to cart.", false);
+        return;
+      }
+      const cartRef = ref(db, `users/${user.uid}/cart/${restaurantId}/items`);
+      push(cartRef, { name: itemName, price, quantity: 1 })
+        .then(() => showAlert(`${itemName} added to cart!`, true))
+        .catch(() => showAlert("Failed to add to cart.", false));
+    };
+
+    window.toggleTheme = function() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      document.getElementById('theme-icon').innerHTML = newTheme === 'light'
+        ? `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>`
+        : `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>`;
+      if (auth.currentUser) {
+        set(ref(db, `users/${auth.currentUser.uid}/theme`), newTheme);
+      }
+    };
+
+    function renderCarousel() {
+      const carouselItems = document.getElementById('carousel-items');
+      carouselItems.innerHTML = banners.map((banner, index) => `
+        <div class="carousel-item ${index === currentBanner ? 'active' : ''}" style="background-image: url('${banner.image}')">
+          <div class="hero-text">${banner.text}</div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+      currentBanner = (currentBanner + 1) % banners.length;
+      renderCarousel();
+    });
+
+    document.getElementById('prev-btn').addEventListener('click', () => {
+      currentBanner = (currentBanner - 1 + banners.length) % banners.length;
+      renderCarousel();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
       console.log("DOMContentLoaded event fired at", new Date().toLocaleString());
       const savedTheme = localStorage.getItem("theme") || "light";
       document.documentElement.setAttribute("data-theme", savedTheme);
+      document.getElementById('theme-icon').innerHTML = savedTheme === 'light'
+        ? `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>`
+        : `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>`;
       console.log("Initial theme set to:", savedTheme);
       initializeFirebase();
+      renderCarousel();
+      setInterval(() => {
+        currentBanner = (currentBanner + 1) % banners.length;
+        renderCarousel();
+      }, 5000);
     });
   </script>
 </body>
