@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Home - My Two Minutes Food</title>
+  <title>Register Your Business - My Two Minutes Food</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js"></script>
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
   <style>
     :root {
       --primary-orange: #F97316;
@@ -78,6 +78,11 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       animation: fadeInLeft 1s ease-out forwards;
       opacity: 0;
+      display: none;
+    }
+
+    .sidebar.active {
+      display: block;
     }
 
     .sidebar-tab {
@@ -94,11 +99,6 @@
       width: 100%;
       cursor: pointer;
       transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .sidebar-tab.active {
-      background: var(--highlight);
-      color: var(--primary-orange);
     }
 
     .sidebar-tab:hover,
@@ -119,13 +119,220 @@
       padding: 0 0.5rem;
     }
 
+    .hero {
+      background: linear-gradient(to right, var(--primary-orange), var(--secondary-orange));
+      color: var(--white);
+      padding: 3rem 1rem;
+      text-align: center;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      animation: fadeInUp 1s ease-out forwards;
+      opacity: 0;
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--white);
+      color: var(--text-dark);
+      font-weight: 600;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      min-height: 44px;
+    }
+
+    .hero-btn:hover,
+    .hero-btn:focus {
+      background: var(--highlight);
+      transform: scale(1.05);
+      outline: 2px solid var(--focus-ring);
+    }
+
+    .benefits, .process {
+      background: var(--card-background);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      animation: fadeInUp 1s ease-out 0.2s forwards;
+      opacity: 0;
+    }
+
+    .benefits h2, .process h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+    }
+
+    .benefits ul, .process ol {
+      list-style: none;
+      padding: 0;
+    }
+
+    .benefits li, .process li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1rem;
+      color: var(--text-dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .process li {
+      position: relative;
+      padding-left: 2.5rem;
+    }
+
+    .process li::before {
+      content: counter(step);
+      counter-increment: step;
+      position: absolute;
+      left: 0;
+      width: 1.5rem;
+      height: 1.5rem;
+      background: var(--primary-orange);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    .benefits svg, .process svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--primary-orange);
+    }
+
+    .register-form {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      animation: fadeInUp 1s ease-out 0.4s forwards;
+      opacity: 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .register-form h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      background: var(--white);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary-orange);
+      box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+
+    .location-btn {
+      padding: 0.5rem 1rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .location-btn:hover,
+    .location-btn:focus {
+      background: var(--highlight);
+      border-color: var(--primary-orange);
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    .location-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    #map {
+      width: 100%;
+      height: 300px;
+      border-radius: 12px;
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+    }
+
+    .register-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(45deg, var(--primary-orange), var(--secondary-orange));
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      min-height: 44px;
+    }
+
+    .register-btn:hover,
+    .register-btn:focus {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      outline: 2px solid var(--focus-ring);
+    }
+
     .header {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
       margin-bottom: 1rem;
-      animation: fadeInUp 1s ease-out 0.5s forwards;
+      animation: fadeInUp 1s ease-out forwards;
       opacity: 0;
     }
 
@@ -153,24 +360,6 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      width: 100%;
-    }
-
-    .search-bar {
-      flex: 1;
-      padding: 0.75rem;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--white);
-      color: var(--text-dark);
-      font-size: 0.9rem;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .search-bar:focus {
-      outline: none;
-      border-color: var(--primary-orange);
-      box-shadow: 0 0 0 3px var(--focus-ring);
     }
 
     .signout-btn {
@@ -193,142 +382,6 @@
     .signout-btn:focus {
       background: var(--highlight);
       border-color: var(--primary-orange);
-      transform: scale(1.05);
-      outline: none;
-    }
-
-    .hero-carousel {
-      width: 100%;
-      height: 33.33vw;
-      max-height: 150px;
-      border-radius: 12px;
-      margin-bottom: 1rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      animation: fadeInUp 1s ease-out 0.7s forwards;
-      opacity: 0;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .carousel-item {
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      display: flex;
-      align-items: flex-end;
-      padding: 0.75rem;
-      position: absolute;
-      top: 0;
-      left: 0;
-      opacity: 0;
-      z-index: 1;
-      transition: opacity 0.5s ease-in-out;
-    }
-
-    .carousel-item.active {
-      opacity: 1;
-      z-index: 2;
-    }
-
-    .carousel-item .hero-text {
-      color: var(--white);
-      font-weight: 700;
-      font-size: 1.1rem;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    }
-
-    .carousel-nav {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: var(--white);
-      border-radius: 50%;
-      padding: 0.75rem;
-      cursor: pointer;
-      transition: background 0.2s ease;
-      min-width: 44px;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .carousel-nav:hover {
-      background: var(--highlight);
-    }
-
-    .prev-nav {
-      left: 0.5rem;
-    }
-
-    .next-nav {
-      right: 0.5rem;
-    }
-
-    .categories {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      overflow-x: auto;
-      padding-bottom: 0.5rem;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: thin;
-      scrollbar-color: var(--primary-orange) var(--white);
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .category-btn {
-      padding: 0.5rem 1rem;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      font-weight: 600;
-      color: var(--text-dark);
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-      white-space: nowrap;
-      scroll-snap-align: start;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-    }
-
-    .category-btn:hover,
-    .category-btn:focus,
-    .category-btn.active {
-      background: var(--primary-orange);
-      color: var(--white);
-      transform: scale(1.05);
-      outline: none;
-    }
-
-    .sort-filter-container {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .filter-btn {
-      padding: 0.5rem 1rem;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      font-weight: 600;
-      color: var(--text-dark);
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-    }
-
-    .filter-btn:hover,
-    .filter-btn:focus,
-    .filter-btn.active {
-      background: var(--primary-orange);
-      color: var(--white);
       transform: scale(1.05);
       outline: none;
     }
@@ -372,6 +425,7 @@
       font-weight: 500;
       animation: fadeIn 0.3s ease-out forwards;
       max-width: 90%;
+      position: relative;
     }
 
     .custom-alert.active {
@@ -403,169 +457,6 @@
       height: 100%;
     }
 
-    .restaurant-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .no-restaurants {
-      display: none;
-      text-align: center;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      padding: 2rem;
-      margin: 1rem auto;
-      max-width: 90%;
-      background: var(--card-background);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .no-restaurants.active {
-      display: block;
-    }
-
-    .restaurant-card {
-      background: var(--white);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      animation: fadeInUp 1s ease-out forwards;
-      opacity: 0;
-      position: relative;
-    }
-
-    .restaurant-card:nth-child(1) { animation-delay: 0.1s; }
-    .restaurant-card:nth-child(2) { animation-delay: 0.2s; }
-    .restaurant-card:nth-child(3) { animation-delay: 0.3s; }
-    .restaurant-card:nth-child(4) { animation-delay: 0.4s; }
-
-    .restaurant-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .restaurant-image {
-      width: 100%;
-      height: 140px;
-      object-fit: cover;
-    }
-
-    .restaurant-content {
-      padding: 0.75rem;
-    }
-
-    .restaurant-name {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
-    }
-
-    .restaurant-info {
-      font-size: 0.85rem;
-      color: var(--text-light);
-      margin-bottom: 0.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .restaurant-info svg {
-      width: 14px;
-      height: 14px;
-      fill: var(--primary-orange);
-    }
-
-    .popular-item {
-      margin-top: 0.5rem;
-      border-top: 1px solid var(--border);
-      padding-top: 0.5rem;
-    }
-
-    .add-to-cart-btn {
-      width: 100%;
-      padding: 0.5rem;
-      background: linear-gradient(45deg, var(--primary-orange), var(--secondary-orange));
-      color: var(--white);
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.2s ease;
-      margin-top: 0.5rem;
-      min-height: 44px;
-    }
-
-    .add-to-cart-btn:hover,
-    .add-to-cart-btn:focus {
-      transform: scale(1.05);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      outline: 2px solid var(--focus-ring);
-    }
-
-    .favorite-btn {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      padding: 0.5rem;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.2s ease;
-      min-width: 44px;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .favorite-btn:hover,
-    .favorite-btn:focus {
-      background: var(--highlight);
-      transform: scale(1.1);
-      outline: none;
-    }
-
-    .favorite-btn svg {
-      width: 18px;
-      height: 18px;
-      fill: none;
-      stroke: currentColor;
-    }
-
-    .favorite-btn.favorited svg {
-      fill: var(--danger-red);
-      stroke: none;
-    }
-
-    .view-menu-btn {
-      width: 100%;
-      padding: 0.5rem;
-      background: linear-gradient(45deg, var(--primary-orange), var(--secondary-orange));
-      color: var(--white);
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.2s ease;
-      margin-top: 0.5rem;
-      min-height: 44px;
-    }
-
-    .view-menu-btn:hover,
-    .view-menu-btn:focus {
-      transform: scale(1.05);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      outline: 2px solid var(--focus-ring);
-    }
-
     .mobile-nav {
       display: none;
       position: fixed;
@@ -577,6 +468,10 @@
       padding: 0.75rem 0;
       z-index: 10;
       min-height: 60px;
+    }
+
+    .mobile-nav.active {
+      display: block;
     }
 
     .nav-items {
@@ -639,13 +534,55 @@
       .sidebar {
         display: none;
       }
-      .mobile-nav {
+      .sidebar.active {
+        display: none;
+      }
+      .mobile-nav.active {
         display: block;
       }
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
+      .hero {
+        padding: 2rem 0.5rem;
+      }
+      .hero h1 {
+        font-size: 1.5rem;
+      }
+      .hero p {
+        font-size: 1rem;
+      }
+      .hero-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+      .benefits h2, .process h2 {
+        font-size: 1.25rem;
+      }
+      .benefits li, .process li {
+        font-size: 0.9rem;
+      }
+      .register-form {
+        padding: 1rem;
+      }
+      .register-form h2 {
+        font-size: 1.1rem;
+      }
+      .form-group label {
+        font-size: 0.85rem;
+      }
+      .form-group input,
+      .form-group select {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+      }
+      .location-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        min-height: 40px;
+      }
+      #map {
+        height: 200px;
+      }
+      .register-btn {
+        font-size: 0.85rem;
       }
       .header-title {
         font-size: 1.25rem;
@@ -655,77 +592,57 @@
         height: 24px;
       }
       .search-container {
-        flex: 1;
         gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-      .search-bar {
-        width: 100%;
-        font-size: 0.85rem;
-        padding: 0.5rem;
       }
       .signout-btn {
         padding: 0.5rem;
         font-size: 0.85rem;
-      }
-      .hero-carousel {
-        max-height: 120px;
-      }
-      .carousel-item .hero-text {
-        font-size: 0.95rem;
-        padding: 0.5rem;
-      }
-      .carousel-nav {
-        padding: 0.5rem;
-        min-width: 40px;
-        min-height: 40px;
-      }
-      .categories {
-        padding-bottom: 0.75rem;
-      }
-      .category-btn {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.85rem;
-        min-height: 40px;
-      }
-      .sort-filter-container {
-        gap: 0.5rem;
-      }
-      .filter-btn {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.85rem;
-        min-height: 40px;
-      }
-      .restaurant-grid {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
-        margin: 0 0.25rem 1rem;
-      }
-      .no-restaurants {
-        font-size: 1.1rem;
-        padding: 1.5rem;
-      }
-      .restaurant-image {
-        height: 120px;
-      }
-      .restaurant-content {
-        padding: 0.5rem;
-      }
-      .restaurant-name {
-        font-size: 1rem;
-      }
-      .restaurant-info {
-        font-size: 0.8rem;
-      }
-      .restaurant-info svg {
-        width: 12px;
-        height: 12px;
       }
     }
 
     @media (max-width: 480px) {
       .main-container {
         padding: 0.5rem 0.25rem 3.5rem;
+      }
+      .hero {
+        padding: 1.5rem 0.25rem;
+      }
+      .hero h1 {
+        font-size: 1.25rem;
+      }
+      .hero p {
+        font-size: 0.9rem;
+      }
+      .hero-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+      }
+      .benefits h2, .process h2 {
+        font-size: 1.1rem;
+      }
+      .benefits li, .process li {
+        font-size: 0.85rem;
+      }
+      .register-form h2 {
+        font-size: 1rem;
+      }
+      .form-group label {
+        font-size: 0.8rem;
+      }
+      .form-group input,
+      .form-group select {
+        font-size: 0.8rem;
+        padding: 0.5rem;
+      }
+      .location-btn {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.75rem;
+      }
+      #map {
+        height: 150px;
+      }
+      .register-btn {
+        font-size: 0.8rem;
       }
       .header-title {
         font-size: 1.1rem;
@@ -734,32 +651,10 @@
         width: 20px;
         height: 20px;
       }
-      .search-bar {
-        font-size: 0.8rem;
-        padding: 0.5rem;
-      }
       .signout-btn {
         min-width: 40px;
         min-height: 40px;
         font-size: 0.8rem;
-      }
-      .hero-carousel {
-        max-height: 100px;
-      }
-      .carousel-item .hero-text {
-        font-size: 0.85rem;
-      }
-      .carousel-nav {
-        min-width: 36px;
-        min-height: 36px;
-      }
-      .category-btn {
-        font-size: 0.8rem;
-        padding: 0.5rem 0.75rem;
-      }
-      .filter-btn {
-        font-size: 0.8rem;
-        padding: 0.5rem 0.75rem;
       }
       .mobile-nav {
         min-height: 56px;
@@ -773,23 +668,10 @@
         width: 24px;
         height: 24px;
       }
-      .restaurant-image {
-        height: 100px;
-      }
-      .restaurant-name {
-        font-size: 0.95rem;
-      }
-      .restaurant-info {
-        font-size: 0.75rem;
-      }
-      .no-restaurants {
-        font-size: 1rem;
-        padding: 1rem;
-      }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .header, .restaurant-card, .dot, .sidebar, .hero-carousel, .no-restaurants {
+      .header, .hero, .benefits, .process, .register-form, .dot, .sidebar, .custom-alert {
         animation: none;
       }
     }
@@ -797,8 +679,8 @@
 </head>
 <body>
   <div class="main-container">
-    <div class="sidebar">
-      <button class="sidebar-tab active" onclick="switchTab('home')">
+    <div class="sidebar" id="sidebar">
+      <button class="sidebar-tab" onclick="switchTab('home')">
         <svg viewBox="0 0 24 24">
           <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
         </svg>
@@ -821,26 +703,69 @@
       <div class="header">
         <h1 class="header-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79-4-4-4z"/>
           </svg>
-          My Two Minutes Food
+          Register Your Business
         </h1>
         <div class="search-container">
-          <input
-            type="text"
-            id="search-bar"
-            placeholder="Search restaurants..."
-            class="search-bar"
-            aria-label="Search restaurants"
-            oninput="filterRestaurants()"
-          />
           <button id="theme-toggle" class="signout-btn" onclick="toggleTheme()" aria-label="Toggle theme">
             <svg id="theme-icon" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
             </svg>
           </button>
-          <button class="signout-btn" onclick="handleSignOut()">Sign Out</button>
+          <button id="signout-btn" class="signout-btn" onclick="handleSignOut()" style="display: none;">Sign Out</button>
         </div>
+      </div>
+      <div class="hero">
+        <h1>Join My Two Minutes Food</h1>
+        <p>Reach new customers and grow your business with our platform.</p>
+        <a href="#register-form" class="hero-btn">Get Started</a>
+      </div>
+      <div class="benefits">
+        <h2>Why Join Us?</h2>
+        <ul>
+          <li>
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/>
+            </svg>
+            Reach thousands of local customers.
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24">
+              <path d="M4 11v2h16v-2H4zm17-4H3v10h18V7zM3 5h18v2H3V5zm0 12h18v2H3v-2z"/>
+            </svg>
+            Easy-to-use dashboard to manage orders.
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            Fast setup and dedicated support.
+          </li>
+        </ul>
+      </div>
+      <div class="process">
+        <h2>How It Works</h2>
+        <ol style="counter-reset: step;">
+          <li>
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79-4-4-4z"/>
+            </svg>
+            Sign up with your business details.
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24">
+              <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/>
+            </svg>
+            Submit your application for review.
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            Get approved and start receiving orders.
+          </li>
+        </ol>
       </div>
       <div id="custom-alert" class="custom-alert" role="dialog" aria-hidden="true" aria-labelledby="alert-message">
         <button class="close-btn" onclick="hideAlert()" aria-label="Close alert">
@@ -851,70 +776,95 @@
         </button>
         <p id="alert-message"></p>
       </div>
-      <div class="hero-carousel relative">
-        <div id="carousel-items"></div>
-        <button id="prev-btn" class="carousel-nav prev-nav">
-          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="var(--primary-orange)" stroke-width="2">
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
-        </button>
-        <button id="next-btn" class="carousel-nav next-nav">
-          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="var(--primary-orange)" stroke-width="2">
-            <path d="M9 18l6-6-6-6"/>
-          </svg>
-        </button>
-      </div>
-      <div class="categories">
-        <button class="category-btn active" onclick="filterCategory('all')">All</button>
-        <button class="category-btn" onclick="filterCategory('Pizza')">Pizza</button>
-        <button class="category-btn" onclick="filterCategory('Fast Food')">Fast Food</button>
-        <button class="category-btn" onclick="filterCategory('Burgers')">Burgers</button>
-        <button class="category-btn" onclick="filterCategory('Wings')">Wings</button>
-        <button class="category-btn" onclick="filterCategory('Sushi')">Sushi</button>
-        <button class="category-btn" onclick="filterCategory('Healthy')">Healthy</button>
-        <button class="category-btn" onclick="filterCategory('Seafood')">Seafood</button>
-        <button class="category-btn" onclick="filterCategory('Bakery')">Bakery</button>
-        <button class="category-btn" onclick="filterCategory('Asian')">Asian</button>
-        <button class="category-btn" onclick="filterCategory('Chinese')">Chinese</button>
-        <button class="category-btn" onclick="filterCategory('BBQ')">BBQ</button>
-        <button class="category-btn" onclick="filterCategory('Halal')">Halal</button>
-        <button class="category-btn" onclick="filterCategory('Indian')">Indian</button>
-        <button class="category-btn" onclick="filterCategory('Sandwich')">Sandwich</button>
-        <button class="category-btn" onclick="filterCategory('Breakfast')">Breakfast</button>
-        <button class="category-btn" onclick="filterCategory('Mexican')">Mexican</button>
-        <button class="category-btn" onclick="filterCategory('Soul Food')">Soul Food</button>
-        <button class="category-btn" onclick="filterCategory('Comfort Food')">Comfort Food</button>
-        <button class="category-btn" onclick="filterCategory('American')">American</button>
-        <button class="category-btn" onclick="filterCategory('Coffee')">Coffee</button>
-        <button class="category-btn" onclick="filterCategory('Italian')">Italian</button>
-        <button class="category-btn" onclick="filterCategory('Salads')">Salads</button>
-        <button class="category-btn" onclick="filterCategory('Soup')">Soup</button>
-        <button class="category-btn" onclick="filterCategory('Smoothies')">Smoothies</button>
-        <button class="category-btn" onclick="filterCategory('Korean')">Korean</button>
-        <button class="category-btn" onclick="filterCategory('Japanese')">Japanese</button>
-      </div>
-      <div class="sort-filter-container">
-        <select id="sort-by" onchange="sortRestaurants()" class="search-bar">
-          <option value="name">Sort by Name</option>
-          <option value="rating">Sort by Rating</option>
-          <option value="distance">Sort by Distance</option>
-        </select>
-        <button id="open-now-filter" class="filter-btn" onclick="toggleFilter('openNow')">Open Now</button>
-        <button id="fast-delivery-filter" class="filter-btn" onclick="toggleFilter('fastDelivery')">Fast Delivery</button>
-      </div>
       <div class="loader active" id="loader">
         <div class="dot"></div>
         <div class="dot"></div>
         <div class="dot"></div>
       </div>
-      <div class="no-restaurants" id="no-restaurants">
-        Restaurants coming soon from your area
+      <div class="register-form" id="register-form">
+        <h2>Register Your Business</h2>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            aria-label="Email address"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            aria-label="Password"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="business-name">Business Name</label>
+          <input
+            type="text"
+            id="business-name"
+            placeholder="Enter your business name"
+            aria-label="Business name"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="business-type">Business Type</label>
+          <select id="business-type" aria-label="Business type" required>
+            <option value="restaurant">Restaurant</option>
+            <option value="shop">Shop</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="business-address">Business Address</label>
+          <div class="flex items-center gap-0.5rem">
+            <input
+              type="text"
+              id="business-address"
+              placeholder="Enter your business address"
+              aria-label="Business address"
+              required
+            />
+            <button class="location-btn" onclick="geocodeAddress()" aria-label="Validate address">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9s-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              Validate Address
+            </button>
+          </div>
+        </div>
+        <div id="map" role="region" aria-label="Map showing business location"></div>
+        <div class="form-group">
+          <label for="contact-name">Contact Name</label>
+          <input
+            type="text"
+            id="contact-name"
+            placeholder="Enter contact name"
+            aria-label="Contact name"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="contact-number">Contact Number</label>
+          <input
+            type="tel"
+            id="contact-number"
+            placeholder="Enter contact number"
+            aria-label="Contact number"
+            required
+          />
+        </div>
+        <button class="register-btn" onclick="registerBusiness()">Register Business</button>
       </div>
-      <div class="restaurant-grid" id="restaurant-grid"></div>
     </div>
-    <div class="mobile-nav">
+    <div class="mobile-nav" id="mobile-nav">
       <div class="nav-items">
-        <div class="nav-item active" onclick="switchTab('home')">
+        <div class="nav-item" onclick="switchTab('home')">
           <svg viewBox="0 0 24 24">
             <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
           </svg>
@@ -938,8 +888,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getDatabase, ref, onValue, set, get, remove, push } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
@@ -952,20 +902,24 @@
       measurementId: "G-V4W97VMSKL"
     };
 
-    mapboxgl.accessToken = 'pk.eyJ1Ijoia2F0bGVnb3BoYXNoYSIsImEiOiJjbTlpOTdzbmYwMGNsMmpzYWJtZzN4d3pqIn0.Zt-aSMEoahrV3zkiVVHbOw';
+    const MAPBOX_TOKEN = 'YOUR_MAPBOX_ACCESS_TOKEN'; // Replace with your Mapbox access token
 
     let app, auth, db;
-    let restaurants = [];
-    let currentCategory = 'all';
-    let userLocation = null;
-    let filters = { openNow: false, fastDelivery: false };
+    let map, marker;
 
-    const banners = [
-      { image: 'https://i.postimg.cc/DzN43Zc1/img.jpg', text: 'Discover Delicious Meals Near You!' },
-      { image: 'https://i.postimg.cc/m23MqC69/img2.jpg', text: 'Try Our New Dishes Today!' },
-      { image: 'https://via.placeholder.com/1200x200?text=Promo+2', text: 'New Restaurants Added!' }
-    ];
-    let currentBanner = 0;
+    const customAlert = document.getElementById("custom-alert");
+    const alertMessage = document.getElementById("alert-message");
+    const loader = document.getElementById("loader");
+    const sidebar = document.getElementById("sidebar");
+    const mobileNav = document.getElementById("mobile-nav");
+    const signoutBtn = document.getElementById("signout-btn");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const businessNameInput = document.getElementById("business-name");
+    const businessTypeSelect = document.getElementById("business-type");
+    const businessAddressInput = document.getElementById("business-address");
+    const contactNameInput = document.getElementById("contact-name");
+    const contactNumberInput = document.getElementById("contact-number");
 
     function initializeFirebase() {
       try {
@@ -980,12 +934,6 @@
         hideSpinner();
       }
     }
-
-    const customAlert = document.getElementById("custom-alert");
-    const alertMessage = document.getElementById("alert-message");
-    const loader = document.getElementById("loader");
-    const restaurantGrid = document.getElementById("restaurant-grid");
-    const noRestaurants = document.getElementById("no-restaurants");
 
     function showSpinner() {
       loader.classList.add("active");
@@ -1015,40 +963,101 @@
       console.log("Alert hidden");
     }
 
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371;
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
+    async function geocodeAddress() {
+      const address = businessAddressInput.value.trim();
+      if (!address) {
+        showAlert("Please enter a business address.", false);
+        return;
+      }
+      showSpinner();
+      try {
+        const response = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${MAPBOX_TOKEN}`
+        );
+        const data = await response.json();
+        if (data.features && data.features.length > 0) {
+          const [lng, lat] = data.features[0].center;
+          businessAddressInput.value = data.features[0].place_name;
+          initializeMap(lng, lat);
+          showAlert("Address validated successfully!", true);
+        } else {
+          showAlert("Invalid address. Please try again.", false);
+        }
+      } catch (error) {
+        console.error("Geocoding failed:", error);
+        showAlert("Failed to validate address. Please try again.", false);
+      } finally {
+        hideSpinner();
+      }
     }
 
-    async function getUserLocation() {
-      if (navigator.geolocation) {
-        try {
-          const position = await new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject);
-          });
-          userLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          };
-          console.log("User location obtained:", userLocation);
-          loadRestaurants();
-        } catch (error) {
-          console.error("Geolocation failed:", error.message);
-          showAlert("Unable to get your location. Showing all restaurants.", false);
-          userLocation = null;
-          loadRestaurants();
+    function initializeMap(lng, lat) {
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+      map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [lng, lat],
+        zoom: 14,
+      });
+      marker = new mapboxgl.Marker({ color: '#F97316' })
+        .setLngLat([lng, lat])
+        .addTo(map);
+      map.addControl(new mapboxgl.NavigationControl());
+      console.log("Map initialized at", [lng, lat]);
+    }
+
+    async function registerBusiness() {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+      const businessName = businessNameInput.value.trim();
+      const businessType = businessTypeSelect.value;
+      const address = businessAddressInput.value.trim();
+      const contactName = contactNameInput.value.trim();
+      const contactNumber = contactNumberInput.value.trim();
+
+      if (!email || !password || !businessName || !businessType || !address || !contactName || !contactNumber) {
+        showAlert("Please fill in all fields.", false);
+        return;
+      }
+
+      showSpinner();
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        await set(ref(db, `users/${user.uid}`), {
+          email,
+          role: "owner",
+          theme: document.documentElement.getAttribute('data-theme') || 'light'
+        });
+        const registrationRef = ref(db, 'pending_registrations');
+        await push(registrationRef, {
+          userId: user.uid,
+          email,
+          businessName,
+          businessType,
+          address,
+          contactName,
+          contactNumber,
+          status: "pending",
+          timestamp: Date.now()
+        });
+        showAlert("Registration submitted! You'll be notified once approved.", true);
+        document.body.classList.add("fade-out");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1500);
+      } catch (error) {
+        console.error("Registration failed:", error.code, error.message);
+        let message = "Failed to register. Please try again.";
+        if (error.code === "auth/email-already-in-use") {
+          message = "Email is already registered.";
+        } else if (error.code === "auth/invalid-email") {
+          message = "Invalid email address.";
+        } else if (error.code === "auth/weak-password") {
+          message = "Password is too weak. Use at least 6 characters.";
         }
-      } else {
-        console.error("Geolocation not supported by browser");
-        showAlert("Geolocation not supported. Showing all restaurants.", false);
-        userLocation = null;
-        loadRestaurants();
+        showAlert(message, false);
+        hideSpinner();
       }
     }
 
@@ -1059,15 +1068,18 @@
         console.log("Persistence set to browserLocalPersistence");
         onAuthStateChanged(auth, (user) => {
           if (user) {
-            console.log("Authenticated user, getting location");
-            getUserLocation();
+            console.log("Authenticated user detected");
+            sidebar.classList.add("active");
+            mobileNav.classList.add("active");
+            signoutBtn.style.display = "flex";
+            showAlert("You are already logged in. Sign out to register a new business.", false);
           } else {
-            console.log("No authenticated user, redirecting to signup.html");
-            document.body.classList.add("fade-out");
-            setTimeout(() => {
-              window.location.href = "signup.html";
-            }, 1500);
+            console.log("No authenticated user");
+            sidebar.classList.remove("active");
+            mobileNav.classList.remove("active");
+            signoutBtn.style.display = "none";
           }
+          hideSpinner();
         });
       } catch (error) {
         console.error("Auth state check failed:", error.code, error.message);
@@ -1076,199 +1088,23 @@
       }
     }
 
-    async function loadRestaurants() {
-      const restaurantsRef = ref(db, "restaurants");
-      onValue(restaurantsRef, async (snapshot) => {
-        restaurants = [];
-        const data = snapshot.val();
-        if (data) {
-          restaurants = Object.keys(data).map(key => ({ id: key, ...data[key], isFavorite: false }));
-          if (auth.currentUser) {
-            const favoritesRef = ref(db, `users/${auth.currentUser.uid}/favorites`);
-            const favoritesSnapshot = await get(favoritesRef);
-            const favorites = favoritesSnapshot.val() || {};
-            restaurants.forEach(r => {
-              r.isFavorite = !!favorites[r.id];
-            });
-          }
-        }
-        renderRestaurants();
-        hideSpinner();
-      }, (error) => {
-        console.error("Failed to load restaurants:", error.code, error.message);
-        showAlert("Failed to load restaurants. Please try again.", false);
-        hideSpinner();
-      });
-    }
-
-    function isRestaurantOpen(hours) {
-      if (!hours) return true;
-      const now = new Date();
-      const [open, close] = hours.split('-').map(t => {
-        const [h, m] = t.split(':').map(Number);
-        return new Date().setHours(h, m, 0, 0);
-      });
-      return now >= open && now <= close;
-    }
-
-    function renderRestaurants() {
-      const searchTerm = document.getElementById("search-bar").value.toLowerCase();
-      const sortBy = document.getElementById("sort-by").value;
-      let filteredRestaurants = restaurants.filter(restaurant => {
-        const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm);
-        const matchesCategory = currentCategory === 'all' || restaurant.cuisine === currentCategory;
-        let matchesDistance = true;
-        if (userLocation && restaurant.latitude && restaurant.longitude) {
-          const distance = calculateDistance(
-            userLocation.latitude,
-            userLocation.longitude,
-            restaurant.latitude,
-            restaurant.longitude
-          );
-          matchesDistance = distance <= 20;
-        }
-        const matchesOpenNow = !filters.openNow || isRestaurantOpen(restaurant.openHours);
-        const matchesFastDelivery = !filters.fastDelivery || (restaurant.deliveryTime && restaurant.deliveryTime <= 30);
-        return matchesSearch && matchesCategory && matchesDistance && matchesOpenNow && matchesFastDelivery;
-      });
-
-      filteredRestaurants.sort((a, b) => {
-        if (sortBy === 'rating') return b.rating - a.rating;
-        if (sortBy === 'distance' && userLocation) {
-          const distA = calculateDistance(userLocation.latitude, userLocation.longitude, a.latitude, a.longitude);
-          const distB = calculateDistance(userLocation.latitude, userLocation.longitude, b.latitude, b.longitude);
-          return distA - distB;
-        }
-        return a.name.localeCompare(b.name);
-      });
-
-      if (filteredRestaurants.length === 0) {
-        restaurantGrid.style.display = 'none';
-        noRestaurants.classList.add('active');
-      } else {
-        restaurantGrid.style.display = 'grid';
-        noRestaurants.classList.remove('active');
-        restaurantGrid.innerHTML = filteredRestaurants.map(restaurant => {
-          const distance = userLocation && restaurant.latitude && restaurant.longitude
-            ? calculateDistance(userLocation.latitude, userLocation.longitude, restaurant.latitude, restaurant.longitude).toFixed(1)
-            : "N/A";
-          return `
-            <div class="restaurant-card">
-              <img
-                src="${restaurant.image || 'https://via.placeholder.com/300x180?text=Delicious+Food'}"
-                alt="${restaurant.name}"
-                class="restaurant-image"
-                onerror="this.src='https://via.placeholder.com/300x180?text=Delicious+Food';"
-              />
-              <div class="restaurant-content">
-                <h2 class="restaurant-name">${restaurant.name}</h2>
-                <p class="restaurant-info">
-                  <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-                  </svg>
-                  ${restaurant.cuisine}
-                </p>
-                <p class="restaurant-info">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/>
-                  </svg>
-                  ${restaurant.rating} ★
-                </p>
-                <p class="restaurant-info">
-                  <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-                  </svg>
-                  ${distance} km
-                </p>
-                ${restaurant.popularItem ? `
-                  <div class="popular-item">
-                    <p>${restaurant.popularItem.name} - $${restaurant.popularItem.price}</p>
-                    <button class="add-to-cart-btn" onclick="addToCart('${restaurant.id}', '${restaurant.popularItem.name}', ${restaurant.popularItem.price})">Add to Cart</button>
-                  </div>
-                ` : ''}
-                <button class="view-menu-btn" onclick="viewMenu('${restaurant.id}')">View Menu</button>
-              </div>
-              <button class="favorite-btn" onclick="toggleFavorite('${restaurant.id}')">
-                <svg viewBox="0 0 24 24" fill="${restaurant.isFavorite ? 'var(--danger-red)' : 'none'}" stroke="currentColor" stroke-width="2">
-                  <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/>
-                </svg>
-              </button>
-            </div>
-          `;
-        }).join("");
-      }
-    }
-
-    window.filterRestaurants = function () {
-      renderRestaurants();
-    };
-
-    window.filterCategory = function (category) {
-      currentCategory = category;
-      document.querySelectorAll(".category-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.textContent === category);
-      });
-      renderRestaurants();
-    };
-
-    window.sortRestaurants = function () {
-      renderRestaurants();
-    };
-
-    window.toggleFilter = function (filter) {
-      filters[filter] = !filters[filter];
-      document.getElementById(`${filter}-filter`).classList.toggle('active', filters[filter]);
-      renderRestaurants();
-    };
-
-    window.viewMenu = function (restaurantId) {
-      showAlert(`View menu for restaurant ID: ${restaurantId}`, true);
-      console.log(`Viewing menu for restaurant: ${restaurantId}`);
-    };
-
-    window.switchTab = function (tab) {
+    window.switchTab = function(tab) {
       document.querySelectorAll(".sidebar-tab").forEach(t => t.classList.remove("active"));
       document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
       document.querySelector(`.sidebar-tab[onclick="switchTab('${tab}')"]`).classList.add("active");
       document.querySelector(`.nav-item[onclick="switchTab('${tab}')"]`).classList.add("active");
+      document.body.classList.add("fade-out");
+      setTimeout(() => {
+        if (tab === 'home') {
+          window.location.href = "index.html";
+        } else if (tab === 'favorites') {
+          window.location.href = "favorites.html";
+        } else if (tab === 'orders') {
+          window.location.href = "orders.html";
+        }
+      }, 500);
       showAlert(`Switched to ${tab} tab`, true);
       console.log(`Switched to ${tab} tab`);
-    };
-
-    window.toggleFavorite = async function(restaurantId) {
-      const user = auth.currentUser;
-      if (!user) {
-        showAlert("Please sign in to favorite restaurants.", false);
-        return;
-      }
-      const favoriteRef = ref(db, `users/${user.uid}/favorites/${restaurantId}`);
-      const snapshot = await get(favoriteRef);
-      const isFavorited = snapshot.exists();
-      if (isFavorited) {
-        remove(favoriteRef).then(() => {
-          showAlert("Removed from favorites!", true);
-          restaurants.find(r => r.id === restaurantId).isFavorite = false;
-          renderRestaurants();
-        });
-      } else {
-        set(favoriteRef, true).then(() => {
-          showAlert("Added to favorites!", true);
-          restaurants.find(r => r.id === restaurantId).isFavorite = true;
-          renderRestaurants();
-        });
-      }
-    };
-
-    window.addToCart = function(restaurantId, itemName, price) {
-      const user = auth.currentUser;
-      if (!user) {
-        showAlert("Please sign in to add items to cart.", false);
-        return;
-      }
-      const cartRef = ref(db, `users/${user.uid}/cart/${restaurantId}/items`);
-      push(cartRef, { name: itemName, price, quantity: 1 })
-        .then(() => showAlert(`${itemName} added to cart!`, true))
-        .catch(() => showAlert("Failed to add to cart.", false));
     };
 
     window.toggleTheme = function() {
@@ -1284,24 +1120,18 @@
       }
     };
 
-    function renderCarousel() {
-      const carouselItems = document.getElementById('carousel-items');
-      carouselItems.innerHTML = banners.map((banner, index) => `
-        <div class="carousel-item ${index === currentBanner ? 'active' : ''}" style="background-image: url('${banner.image}')">
-          <div class="hero-text">${banner.text}</div>
-        </div>
-      `).join('');
-    }
-
-    document.getElementById('next-btn').addEventListener('click', () => {
-      currentBanner = (currentBanner + 1) % banners.length;
-      renderCarousel();
-    });
-
-    document.getElementById('prev-btn').addEventListener('click', () => {
-      currentBanner = (currentBanner - 1 + banners.length) % banners.length;
-      renderCarousel();
-    });
+    window.handleSignOut = function() {
+      signOut(auth).then(() => {
+        console.log("User signed out at", new Date().toLocaleString());
+        document.body.classList.add("fade-out");
+        setTimeout(() => {
+          window.location.href = "signup.html";
+        }, 1500);
+      }).catch((error) => {
+        console.error("Sign out failed:", error.code, error.message);
+        showAlert("Failed to sign out. Please try again.", false);
+      });
+    };
 
     document.addEventListener('DOMContentLoaded', () => {
       console.log("DOMContentLoaded event fired at", new Date().toLocaleString());
@@ -1312,11 +1142,6 @@
         : `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>`;
       console.log("Initial theme set to:", savedTheme);
       initializeFirebase();
-      renderCarousel();
-      setInterval(() => {
-        currentBanner = (currentBanner + 1) % banners.length;
-        renderCarousel();
-      }, 5000);
     });
   </script>
 </body>
