@@ -841,14 +841,14 @@
         return;
       }
 
-      // Basic phone number validation (e.g., at least 7 digits, allows + and -)
+      // Basic phone number validation
       const phoneRegex = /^\+?[\d\s-]{7,}$/;
       if (!phoneRegex.test(contactNumber)) {
         showAlert("Please enter a valid contact number (at least 7 digits).", false);
         return;
       }
 
-      // Check authentication state again before submission
+      // Check authentication
       const user = auth.currentUser;
       if (!user) {
         showAlert("You must be logged in to register a business.", false);
@@ -859,18 +859,28 @@
       registerBtn.disabled = true;
       showSpinner();
       console.log("Sending data to Firebase at", new Date().toLocaleString());
+
       try {
-        const registrationRef = ref(db, 'pending_registrations');
-        await push(registrationRef, {
-          businessName,
-          businessType,
-          address,
-          contactName,
-          contactNumber,
-          userId: user.uid,
-          status: "pending",
-          timestamp: Date.now()
+        // Timeout after 10 seconds
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error("Firebase operation timed out after 10 seconds")), 10000);
         });
+
+        const registrationRef = ref(db, 'pending_registrations');
+        await Promise.race([
+          push(registrationRef, {
+            businessName,
+            businessType,
+            address,
+            contactName,
+            contactNumber,
+            userId: user.uid,
+            status: "pending",
+            timestamp: Date.now()
+          }),
+          timeoutPromise
+        ]);
+
         console.log("Data sent to Firebase successfully at", new Date().toLocaleString());
         showAlert("Registration submitted! You'll be notified once approved.", true);
         // Ensure spinner is visible for at least 500ms
@@ -881,10 +891,19 @@
           }, 500);
         }, 500);
       } catch (error) {
-        console.error("Registration failed:", error.code, error.message);
-        showAlert(`Failed to register: ${error.message}. Please try again.`, false);
-        registerBtn.disabled = false;
+        console.error("Registration failed:", error.code || "unknown", error.message);
+        let errorMessage = "Failed to register: ";
+        if (error.message.includes("timeout")) {
+          errorMessage += "The operation took too long. Please check your network and try again.";
+        } else if (error.code === "PERMISSION_DENIED") {
+          errorMessage += "You don't have permission to register. Please ensure you're logged in.";
+        } else {
+          errorMessage += error.message || "An unexpected error occurred.";
+        }
+        showAlert(errorMessage, false);
+      } finally {
         hideSpinner();
+        registerBtn.disabled = false;
       }
     }
 
@@ -920,7 +939,7 @@
           }, 500);
         } else {
           console.log("User authenticated with UID:", user.uid, "at", new Date().toLocaleString());
-          // Initialize theme and event listeners only for authenticated users
+          // Initialize theme and event listeners
           const savedTheme = localStorage.getItem("theme") || "light";
           document.documentElement.setAttribute("data-theme", savedTheme);
           document.getElementById('theme-icon').innerHTML = savedTheme === 'light'
