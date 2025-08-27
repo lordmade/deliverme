@@ -682,6 +682,16 @@
           />
         </div>
         <div class="form-group">
+          <label for="contact-email">Contact Email</label>
+          <input
+            type="email"
+            id="contact-email"
+            placeholder="Enter contact email"
+            aria-label="Contact email"
+            required
+          />
+        </div>
+        <div class="form-group">
           <label for="contact-number">Contact Number</label>
           <input
             type="tel"
@@ -725,6 +735,7 @@
     const businessTypeSelect = document.getElementById("business-type");
     const businessAddressInput = document.getElementById("business-address");
     const contactNameInput = document.getElementById("contact-name");
+    const contactEmailInput = document.getElementById("contact-email");
     const contactNumberInput = document.getElementById("contact-number");
     const registerBtn = document.querySelector(".register-btn");
 
@@ -833,15 +844,23 @@
       const businessType = businessTypeSelect.value;
       const address = businessAddressInput.value.trim();
       const contactName = contactNameInput.value.trim();
+      const contactEmail = contactEmailInput.value.trim();
       const contactNumber = contactNumberInput.value.trim();
 
       // Validate inputs
-      if (!businessName || !businessType || !address || !contactName || !contactNumber) {
+      if (!businessName || !businessType || !address || !contactName || !contactEmail || !contactNumber) {
         showAlert("Please fill in all fields.", false);
         return;
       }
 
-      // Basic phone number validation
+      // Email validation
+      const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+      if (!emailRegex.test(contactEmail)) {
+        showAlert("Please enter a valid email address.", false);
+        return;
+      }
+
+      // Phone number validation
       const phoneRegex = /^\+?[\d\s-]{7,}$/;
       if (!phoneRegex.test(contactNumber)) {
         showAlert("Please enter a valid contact number (at least 7 digits).", false);
@@ -873,6 +892,7 @@
             businessType,
             address,
             contactName,
+            contactEmail,
             contactNumber,
             userId: user.uid,
             status: "pending",
