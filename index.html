@@ -6,6 +6,7 @@
   <title>Register Your Business - My Two Minutes Food</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js"></script>
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
@@ -697,6 +698,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
     const firebaseConfig = {
@@ -713,7 +715,7 @@
     // Verify this Mapbox token in your Mapbox dashboard and ensure it has the correct scopes (geocoding, map tiles)
     const MAPBOX_TOKEN = 'pk.eyJ1Ijoia2F0bGVnb3BoYXNoYSIsImEiOiJjbTlpOTdzbmYwMGNsMmpzYWJtZzN4d3pqIn0.Zt-aSMEoahrV3zkiVVHbOw';
 
-    let app, db;
+    let app, db, auth;
     let map, marker;
 
     const customAlert = document.getElementById("custom-alert");
@@ -729,6 +731,7 @@
     function initializeFirebase() {
       try {
         app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
         db = getDatabase(app);
         console.log("Firebase initialized successfully at", new Date().toLocaleString());
         hideSpinner();
@@ -845,6 +848,14 @@
         return;
       }
 
+      // Check authentication state again before submission
+      const user = auth.currentUser;
+      if (!user) {
+        showAlert("You must be logged in to register a business.", false);
+        window.location.href = "signup.html";
+        return;
+      }
+
       registerBtn.disabled = true;
       showSpinner();
       console.log("Sending data to Firebase at", new Date().toLocaleString());
@@ -856,6 +867,7 @@
           address,
           contactName,
           contactNumber,
+          userId: user.uid,
           status: "pending",
           timestamp: Date.now()
         });
@@ -897,16 +909,29 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       console.log("DOMContentLoaded event fired at", new Date().toLocaleString());
-      const savedTheme = localStorage.getItem("theme") || "light";
-      document.documentElement.setAttribute("data-theme", savedTheme);
-      document.getElementById('theme-icon').innerHTML = savedTheme === 'light'
-        ? `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>`
-        : `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>`;
-      console.log("Initial theme set to:", savedTheme);
       initializeFirebase();
-      // Add event listeners for buttons
-      document.querySelector(".location-btn").addEventListener("click", geocodeAddress);
-      registerBtn.addEventListener("click", registerBusiness);
+      // Check authentication state
+      onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          console.log("No user authenticated, redirecting to signup.html at", new Date().toLocaleString());
+          document.body.classList.add("fade-out");
+          setTimeout(() => {
+            window.location.href = "signup.html";
+          }, 500);
+        } else {
+          console.log("User authenticated with UID:", user.uid, "at", new Date().toLocaleString());
+          // Initialize theme and event listeners only for authenticated users
+          const savedTheme = localStorage.getItem("theme") || "light";
+          document.documentElement.setAttribute("data-theme", savedTheme);
+          document.getElementById('theme-icon').innerHTML = savedTheme === 'light'
+            ? `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>`
+            : `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>`;
+          console.log("Initial theme set to:", savedTheme);
+          // Add event listeners for buttons
+          document.querySelector(".location-btn").addEventListener("click", geocodeAddress);
+          registerBtn.addEventListener("click", registerBusiness);
+        }
+      });
     });
   </script>
 </body>
