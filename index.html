@@ -889,7 +889,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getDatabase, ref, set, push, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
@@ -1066,13 +1066,37 @@
       try {
         await setPersistence(auth, browserLocalPersistence);
         console.log("Persistence set to browserLocalPersistence");
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
           if (user) {
-            console.log("Authenticated user detected");
+            console.log("Authenticated user detected:", user.uid);
             sidebar.classList.add("active");
             mobileNav.classList.add("active");
             signoutBtn.style.display = "flex";
-            showAlert("You are already logged in. Sign out to register a new business.", false);
+            // Check if the user is approved
+            try {
+              const userRef = ref(db, `users/${user.uid}`);
+              const snapshot = await get(userRef);
+              if (snapshot.exists()) {
+                const userData = snapshot.val();
+                if (userData.approvedBusinessId) {
+                  console.log("User is approved, redirecting to dashboard.html");
+                  showAlert("Redirecting to your dashboard...", true);
+                  document.body.classList.add("fade-out");
+                  setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                  }, 1500);
+                } else {
+                  console.log("User is not approved, staying on register.html");
+                  showAlert("Your registration is pending approval. Please wait for admin review.", false);
+                }
+              } else {
+                console.log("No user data found, staying on register.html");
+                showAlert("No user data found. Please register again or sign out.", false);
+              }
+            } catch (error) {
+              console.error("Error checking user approval status:", error.code, error.message);
+              showAlert("Failed to verify your approval status. Please try again.", false);
+            }
           } else {
             console.log("No authenticated user");
             sidebar.classList.remove("active");
