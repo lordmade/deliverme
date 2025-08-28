@@ -97,7 +97,7 @@
       margin-bottom: 1.5rem;
     }
 
-    .hero-btn {
+    .hero-btn, .my-business-btn {
       padding: 0.75rem 1.5rem;
       background: var(--white);
       color: var(--text-dark);
@@ -107,10 +107,13 @@
       cursor: pointer;
       transition: background 0.2s ease, transform 0.2s ease;
       min-height: 44px;
+      margin: 0 0.5rem;
     }
 
     .hero-btn:hover,
-    .hero-btn:focus {
+    .hero-btn:focus,
+    .my-business-btn:hover,
+    .my-business-btn:focus {
       background: var(--highlight);
       transform: scale(1.05);
       outline: 2px solid var(--focus-ring);
@@ -443,7 +446,7 @@
       .hero p {
         font-size: 1rem;
       }
-      .hero-btn {
+      .hero-btn, .my-business-btn {
         padding: 0.5rem 1rem;
         font-size: 0.9rem;
       }
@@ -503,7 +506,7 @@
       .hero p {
         font-size: 0.9rem;
       }
-      .hero-btn {
+      .hero-btn, .my-business-btn {
         padding: 0.5rem 0.75rem;
         font-size: 0.8rem;
       }
@@ -571,7 +574,10 @@
       <div class="hero">
         <h1>Join My Two Minutes Food</h1>
         <p>Reach new customers and grow your business with our platform.</p>
-        <a href="#register-form" class="hero-btn">Get Started</a>
+        <div class="flex justify-center gap-4">
+          <a href="#register-form" class="hero-btn">Get Started</a>
+          <a href="signup.html" class="my-business-btn">My Business</a>
+        </div>
       </div>
       <div class="benefits">
         <h2>Why Join Us?</h2>
@@ -711,18 +717,17 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
-   const firebaseConfig = {
-  apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
-  authDomain: "fire-b-a8878.firebaseapp.com",
-  databaseURL: "https://fire-b-a8878.firebaseio.com",
-  projectId: "fire-b-a8878",
-  storageBucket: "fire-b-a8878.firebasestorage.app",
-  messagingSenderId: "658673187627",
-  appId: "1:658673187627:web:6e4c29af661785f0afa36e",
-  measurementId: "G-V4W97VMSKL"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
+      authDomain: "fire-b-a8878.firebaseapp.com",
+      databaseURL: "https://fire-b-a8878.firebaseio.com",
+      projectId: "fire-b-a8878",
+      storageBucket: "fire-b-a8878.firebasestorage.app",
+      messagingSenderId: "658673187627",
+      appId: "1:658673187627:web:6e4c29af661785f0afa36e",
+      measurementId: "G-V4W97VMSKL"
+    };
 
-    // Verify this Mapbox token in your Mapbox dashboard and ensure it has the correct scopes (geocoding, map tiles)
     const MAPBOX_TOKEN = 'pk.eyJ1Ijoia2F0bGVnb3BoYXNoYSIsImEiOiJjbTlpOTdzbmYwMGNsMmpzYWJtZzN4d3pqIn0.Zt-aSMEoahrV3zkiVVHbOw';
 
     let app, db, auth;
@@ -847,27 +852,23 @@
       const contactEmail = contactEmailInput.value.trim();
       const contactNumber = contactNumberInput.value.trim();
 
-      // Validate inputs
       if (!businessName || !businessType || !address || !contactName || !contactEmail || !contactNumber) {
         showAlert("Please fill in all fields.", false);
         return;
       }
 
-      // Email validation
       const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
       if (!emailRegex.test(contactEmail)) {
         showAlert("Please enter a valid email address.", false);
         return;
       }
 
-      // Phone number validation
       const phoneRegex = /^\+?[\d\s-]{7,}$/;
       if (!phoneRegex.test(contactNumber)) {
         showAlert("Please enter a valid contact number (at least 7 digits).", false);
         return;
       }
 
-      // Check authentication
       const user = auth.currentUser;
       if (!user) {
         showAlert("You must be logged in to register a business.", false);
@@ -880,7 +881,6 @@
       console.log("Sending data to Firebase at", new Date().toLocaleString());
 
       try {
-        // Timeout after 10 seconds
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error("Firebase operation timed out after 10 seconds")), 10000);
         });
@@ -903,7 +903,6 @@
 
         console.log("Data sent to Firebase successfully at", new Date().toLocaleString());
         showAlert("Registration submitted! You'll be notified once approved.", true);
-        // Ensure spinner is visible for at least 500ms
         setTimeout(() => {
           document.body.classList.add("fade-out");
           setTimeout(() => {
@@ -949,7 +948,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       console.log("DOMContentLoaded event fired at", new Date().toLocaleString());
       initializeFirebase();
-      // Check authentication state
       onAuthStateChanged(auth, (user) => {
         if (!user) {
           console.log("No user authenticated, redirecting to signup.html at", new Date().toLocaleString());
@@ -959,14 +957,12 @@
           }, 500);
         } else {
           console.log("User authenticated with UID:", user.uid, "at", new Date().toLocaleString());
-          // Initialize theme and event listeners
           const savedTheme = localStorage.getItem("theme") || "light";
           document.documentElement.setAttribute("data-theme", savedTheme);
           document.getElementById('theme-icon').innerHTML = savedTheme === 'light'
             ? `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>`
             : `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>`;
           console.log("Initial theme set to:", savedTheme);
-          // Add event listeners for buttons
           document.querySelector(".location-btn").addEventListener("click", geocodeAddress);
           registerBtn.addEventListener("click", registerBusiness);
         }
