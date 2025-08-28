@@ -576,7 +576,7 @@
         <p>Reach new customers and grow your business with our platform.</p>
         <div class="flex justify-center gap-4">
           <a href="#register-form" class="hero-btn">Get Started</a>
-          <a href="signup.html" class="my-business-btn">My Business</a>
+          <button class="my-business-btn" onclick="checkBusinessStatus()">My Business</button>
         </div>
       </div>
       <div class="benefits">
@@ -715,7 +715,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
@@ -784,6 +784,40 @@
       customAlert.setAttribute("aria-hidden", "true");
       document.querySelector(".content").focus();
       console.log("Alert hidden");
+    }
+
+    async function checkBusinessStatus() {
+      const user = auth.currentUser;
+      if (!user) {
+        showAlert("Please sign in to access your business dashboard.", true);
+        document.body.classList.add("fade-out");
+        setTimeout(() => {
+          window.location.href = "signup.html";
+        }, 500);
+        return;
+      }
+
+      showSpinner();
+      try {
+        const userRef = ref(db, `users/${user.uid}`);
+        const userSnapshot = await get(userRef);
+        if (userSnapshot.exists() && userSnapshot.val().approvedBusinessId) {
+          console.log("Approved business found, redirecting to dashboard.html");
+          showAlert("Redirecting to your business dashboard.", true);
+          document.body.classList.add("fade-out");
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 500);
+        } else {
+          console.log("No approved business found for user:", user.uid);
+          showAlert("You don't have an approved business. Please register or wait for approval.", false);
+        }
+      } catch (error) {
+        console.error("Error checking business status:", error);
+        showAlert("Failed to check business status. Please try again.", false);
+      } finally {
+        hideSpinner();
+      }
     }
 
     async function geocodeAddress() {
@@ -944,6 +978,8 @@
         ? `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>`
         : `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>`;
     };
+
+    window.checkBusinessStatus = checkBusinessStatus;
 
     document.addEventListener('DOMContentLoaded', () => {
       console.log("DOMContentLoaded event fired at", new Date().toLocaleString());
