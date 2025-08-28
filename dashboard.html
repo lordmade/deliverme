@@ -283,7 +283,7 @@
       margin-bottom: 0.5rem;
     }
 
-    .form-group input, .form-group textarea {
+    .form-group input, .form-group textarea, .form-group select {
       width: 100%;
       padding: 0.75rem;
       border: 1px solid var(--border);
@@ -293,13 +293,55 @@
       background: var(--white);
     }
 
-    .form-group input:focus, .form-group textarea:focus {
+    .form-group select:focus, .form-group input:focus, .form-group textarea:focus {
       outline: none;
       border-color: var(--primary-orange);
       box-shadow: 0 0 0 3px var(--focus-ring);
     }
 
-    .form-group input:disabled, .form-group textarea:disabled {
+    .form-group input:disabled, .form-group textarea:disabled, .form-group select:disabled {
+      background: var(--highlight);
+      cursor: not-allowed;
+    }
+
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toggle-switch input[type="checkbox"] {
+      appearance: none;
+      width: 40px;
+      height: 20px;
+      background: var(--border);
+      border-radius: 9999px;
+      position: relative;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .toggle-switch input[type="checkbox"]:checked {
+      background: var(--success-green);
+    }
+
+    .toggle-switch input[type="checkbox"]::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: var(--white);
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s ease;
+    }
+
+    .toggle-switch input[type="checkbox"]:checked::before {
+      transform: translateX(20px);
+    }
+
+    .toggle-switch input[type="checkbox"]:disabled {
       background: var(--highlight);
       cursor: not-allowed;
     }
@@ -432,6 +474,19 @@
         flex-direction: column;
         align-items: stretch;
       }
+      .toggle-switch input[type="checkbox"] {
+        width: 36px;
+        height: 18px;
+      }
+      .toggle-switch input[type="checkbox"]::before {
+        width: 14px;
+        height: 14px;
+        top: 2px;
+        left: 2px;
+      }
+      .toggle-switch input[type="checkbox"]:checked::before {
+        transform: translateX(18px);
+      }
     }
 
     @media (max-width: 480px) {
@@ -460,6 +515,19 @@
         min-width: 40px;
         min-height: 40px;
         font-size: 0.8rem;
+      }
+      .toggle-switch input[type="checkbox"] {
+        width: 32px;
+        height: 16px;
+      }
+      .toggle-switch input[type="checkbox"]::before {
+        width: 12px;
+        height: 12px;
+        top: 2px;
+        left: 2px;
+      }
+      .toggle-switch input[type="checkbox"]:checked::before {
+        transform: translateX(16px);
       }
     }
 
@@ -533,8 +601,63 @@
           <input type="text" id="business-name" aria-label="Business Name" required>
         </div>
         <div class="form-group">
-          <label for="business-type">Business Type</label>
-          <input type="text" id="business-type" aria-label="Business Type" disabled>
+          <label for="business-type">Business Category</label>
+          <select id="business-type" aria-label="Business Category" required>
+            <option value="" disabled>Select a category</option>
+            <optgroup label="Restaurants">
+              <option value="Pizza">Pizza</option>
+              <option value="Fast Food">Fast Food</option>
+              <option value="Burgers">Burgers</option>
+              <option value="Wings">Wings</option>
+              <option value="Sushi">Sushi</option>
+              <option value="Healthy">Healthy</option>
+              <option value="Seafood">Seafood</option>
+              <option value="Bakery">Bakery</option>
+              <option value="Asian">Asian</option>
+              <option value="Chinese">Chinese</option>
+              <option value="BBQ">BBQ</option>
+              <option value="Halal">Halal</option>
+              <option value="Indian">Indian</option>
+              <option value="Sandwich">Sandwich</option>
+              <option value="Breakfast">Breakfast</option>
+              <option value="Mexican">Mexican</option>
+              <option value="Soul Food">Soul Food</option>
+              <option value="Comfort Food">Comfort Food</option>
+              <option value="American">American</option>
+              <option value="Coffee">Coffee</option>
+              <option value="Italian">Italian</option>
+              <option value="Salads">Salads</option>
+              <option value="Soup">Soup</option>
+              <option value="Smoothies">Smoothies</option>
+              <option value="Korean">Korean</option>
+              <option value="Japanese">Japanese</option>
+            </optgroup>
+            <optgroup label="Shops">
+              <option value="Electronics">Electronics</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Home & Garden">Home & Garden</option>
+              <option value="Sports">Sports</option>
+              <option value="Beauty">Beauty</option>
+              <option value="Toys">Toys</option>
+              <option value="Books">Books</option>
+              <option value="Jewelry">Jewelry</option>
+              <option value="Accessories">Accessories</option>
+              <option value="Health & Wellness">Health & Wellness</option>
+              <option value="Automotive">Automotive</option>
+              <option value="Pet Supplies">Pet Supplies</option>
+              <option value="Footwear">Footwear</option>
+              <option value="Appliances">Appliances</option>
+              <option value="Furniture">Furniture</option>
+              <option value="Kids">Kids</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="business-status">Business Status</label>
+          <div class="toggle-switch">
+            <input type="checkbox" id="business-status" aria-label="Business Status">
+            <span id="status-label">Closed</span>
+          </div>
         </div>
         <div class="form-group">
           <label for="address">Address</label>
@@ -604,23 +727,25 @@
       measurementId: "G-V4W97VMSKL"
     };
 
-    const CLOUDINARY_UPLOAD_PRESET = 'your_upload_preset'; // Replace with your Cloudinary upload preset
-    const CLOUDINARY_CLOUD_NAME = 'your_cloud_name'; // Replace with your Cloudinary cloud name
+    const CLOUDINARY_UPLOAD_PRESET = 'banter_box'; // Replace with your Cloudinary upload preset
+    const CLOUDINARY_CLOUD_NAME = 'dqkujefxje'; // Replace with your Cloudinary cloud name
 
     let app, auth, db;
     let currentTab = 'business-details';
-    let businessId, businessType, isSuspended = false;
+    let businessId, businessType, isSuspended = false, isNewBusiness = true;
 
-    const customAlert = document.getElementById("custom-alert");
-    const alertMessage = document.getElementById("alert-message");
-    const loader = document.getElementById("loader");
-    const businessDetails = document.getElementById("business-details");
-    const menuManagement = document.getElementById("menu-management");
-    const orders = document.getElementById("orders");
-    const ordersBody = document.getElementById("orders-body");
-    const menuItems = document.getElementById("menu-items");
-    const suspensionNotice = document.getElementById("suspension-notice");
-    const suspensionReason = document.getElementById("suspension-reason");
+    // Define available categories (must match customer app)
+    const RESTAURANT_CATEGORIES = [
+      'Pizza', 'Fast Food', 'Burgers', 'Wings', 'Sushi', 'Healthy', 'Seafood', 'Bakery',
+      'Asian', 'Chinese', 'BBQ', 'Halal', 'Indian', 'Sandwich', 'Breakfast', 'Mexican',
+      'Soul Food', 'Comfort Food', 'American', 'Coffee', 'Italian', 'Salads', 'Soup',
+      'Smoothies', 'Korean', 'Japanese'
+    ];
+    const SHOP_CATEGORIES = [
+      'Electronics', 'Fashion', 'Home & Garden', 'Sports', 'Beauty', 'Toys', 'Books',
+      'Jewelry', 'Accessories', 'Health & Wellness', 'Automotive', 'Pet Supplies', 'Footwear',
+      'Appliances', 'Furniture', 'Kids'
+    ];
 
     function initializeFirebase() {
       try {
@@ -630,38 +755,61 @@
         console.log("Firebase initialized successfully at", new Date().toLocaleString());
         checkAuthState();
       } catch (error) {
-        console.error("Firebase initialization failed:", error.code, error.message);
+        console.error("Firebase initialization failed:", error.code || error.message);
         showAlert("Failed to connect to Firebase. Please check your network.", false);
         hideSpinner();
       }
     }
 
     function showSpinner() {
-      loader.classList.add("active");
-      console.log("Spinner shown at", new Date().toLocaleString());
+      const loader = document.getElementById("loader");
+      if (loader) {
+        loader.classList.add("active");
+        console.log("Spinner shown at", new Date().toLocaleString());
+      } else {
+        console.error("Loader element not found");
+      }
     }
 
     function hideSpinner() {
-      loader.classList.remove("active");
-      console.log("Spinner hidden at", new Date().toLocaleString());
+      const loader = document.getElementById("loader");
+      if (loader) {
+        loader.classList.remove("active");
+        console.log("Spinner hidden at", new Date().toLocaleString());
+      } else {
+        console.error("Loader element not found");
+      }
     }
 
     function showAlert(message, autoHide = true) {
-      alertMessage.textContent = message;
-      customAlert.classList.add("active");
-      customAlert.setAttribute("aria-hidden", "false");
-      document.querySelector(".close-btn").focus();
-      console.log("Alert shown:", message);
-      if (autoHide) {
-        setTimeout(hideAlert, 5000);
+      const alertMessage = document.getElementById("alert-message");
+      const customAlert = document.getElementById("custom-alert");
+      if (alertMessage && customAlert) {
+        alertMessage.textContent = message;
+        customAlert.classList.add("active");
+        customAlert.setAttribute("aria-hidden", "false");
+        const closeBtn = customAlert.querySelector(".close-btn");
+        if (closeBtn) closeBtn.focus();
+        console.log("Alert shown:", message);
+        if (autoHide) {
+          setTimeout(hideAlert, 5000);
+        }
+      } else {
+        console.error("Alert elements not found");
       }
     }
 
     function hideAlert() {
-      customAlert.classList.remove("active");
-      customAlert.setAttribute("aria-hidden", "true");
-      document.querySelector(".content").focus();
-      console.log("Alert hidden");
+      const customAlert = document.getElementById("custom-alert");
+      if (customAlert) {
+        customAlert.classList.remove("active");
+        customAlert.setAttribute("aria-hidden", "true");
+        const content = document.querySelector(".content");
+        if (content) content.focus();
+        console.log("Alert hidden");
+      } else {
+        console.error("Custom alert element not found");
+      }
     }
 
     async function checkAuthState() {
@@ -696,9 +844,13 @@
             }, 1500);
           }
           hideSpinner();
+        }, (error) => {
+          console.error("Auth state error:", error);
+          showAlert("Failed to check authentication state.", false);
+          hideSpinner();
         });
       } catch (error) {
-        console.error("Auth state check failed:", error.code, error.message);
+        console.error("Auth state check failed:", error.code || error.message);
         showAlert("Failed to check authentication state. Please try again.", false);
         hideSpinner();
       }
@@ -714,34 +866,42 @@
 
         if (restaurantSnapshot.exists()) {
           businessData = restaurantSnapshot.val();
-          businessType = "restaurant";
+          businessType = 'restaurants';
         } else if (shopSnapshot.exists()) {
           businessData = shopSnapshot.val();
-          businessType = "shop";
+          businessType = 'shops';
         } else {
           showAlert("Business not found.", false);
           return;
         }
 
         isSuspended = businessData.status === "suspended";
+        isNewBusiness = !businessData.type; // Business is new if no type is set
         document.getElementById("business-name").value = businessData.name || "";
-        document.getElementById("business-type").value = businessType.charAt(0).toUpperCase() + businessType.slice(1);
+        const businessTypeSelect = document.getElementById("business-type");
+        businessTypeSelect.value = businessData.type || "";
+        businessTypeSelect.disabled = !isNewBusiness || isSuspended; // Disable if not new or suspended
+        document.getElementById("business-status").checked = businessData.isOpen || false;
+        document.getElementById("business-status").disabled = isSuspended;
+        document.getElementById("status-label").textContent = businessData.isOpen ? "Open" : "Closed";
         document.getElementById("address").value = businessData.address || "";
         document.getElementById("contact-name").value = businessData.contactName || "";
         document.getElementById("contact-number").value = businessData.contactNumber || "";
         document.getElementById("cloudinary-image").value = businessData.cloudinaryImage || "";
 
         if (isSuspended) {
-          suspensionNotice.style.display = "block";
-          suspensionReason.textContent = businessData.suspensionReason || "No reason provided";
-          document.querySelectorAll(".business-details input, .menu-management input, .action-btn").forEach(el => el.disabled = true);
+          document.getElementById("suspension-notice").style.display = "block";
+          document.getElementById("suspension-reason").textContent = businessData.suspensionReason || "No reason provided";
+          document.querySelectorAll(".business-details input, .business-details select, .menu-management input, .action-btn").forEach(el => el.disabled = true);
           showAlert("Your business is suspended and cannot be edited.", false);
         } else {
-          suspensionNotice.style.display = "none";
-          document.querySelectorAll(".business-details input:not(#business-type), .menu-management input, .action-btn").forEach(el => el.disabled = false);
+          document.getElementById("suspension-notice").style.display = "none";
+          document.querySelectorAll(".business-details input, .business-details select, .menu-management input, .action-btn").forEach(el => el.disabled = false);
+          document.getElementById("business-type").disabled = !isNewBusiness; // Reapply category restriction
+          document.getElementById("business-status").disabled = false;
         }
 
-        console.log("Business details loaded for:", businessId, businessType);
+        console.log("Business details loaded for:", businessId, "Type:", businessType, "New Business:", isNewBusiness);
       } catch (error) {
         console.error("Error loading business details:", error);
         showAlert("Failed to load business details. Please try again.", false);
@@ -755,22 +915,57 @@
       }
       showSpinner();
       try {
-        const businessRef = ref(db, `${businessType}s/${businessId}`);
+        const newType = document.getElementById("business-type").value.trim();
+        const newBusinessType = RESTAURANT_CATEGORIES.includes(newType) ? 'restaurants' : SHOP_CATEGORIES.includes(newType) ? 'shops' : null;
+
+        if (!newType || !newBusinessType) {
+          showAlert("Please select a valid business category.", false);
+          hideSpinner();
+          return;
+        }
+
+        if (!isNewBusiness && newType !== document.getElementById("business-type").value) {
+          showAlert("Category cannot be changed after initial setup.", false);
+          hideSpinner();
+          return;
+        }
+
         const updates = {
           name: document.getElementById("business-name").value.trim(),
+          type: newType,
+          isOpen: document.getElementById("business-status").checked,
           address: document.getElementById("address").value.trim(),
           contactName: document.getElementById("contact-name").value.trim(),
           contactNumber: document.getElementById("contact-number").value.trim(),
           cloudinaryImage: document.getElementById("cloudinary-image").value.trim() || 'https://via.placeholder.com/300x180'
         };
+
         if (!updates.name || !updates.address || !updates.contactName || !updates.contactNumber) {
           showAlert("Please fill in all required fields.", false);
           hideSpinner();
           return;
         }
+
+        // If business type (restaurants/shops) has changed and is allowed (new business)
+        if (isNewBusiness && newBusinessType !== businessType) {
+          const oldRef = ref(db, `${businessType}/${businessId}`);
+          const newRef = ref(db, `${newBusinessType}/${businessId}`);
+          const oldSnapshot = await get(oldRef);
+          if (oldSnapshot.exists()) {
+            await set(newRef, oldSnapshot.val());
+            await remove(oldRef);
+            console.log(`Business moved from ${businessType} to ${newBusinessType}`);
+          }
+          businessType = newBusinessType;
+        }
+
+        const businessRef = ref(db, `${businessType || newBusinessType}/${businessId}`);
         await update(businessRef, updates);
+        isNewBusiness = false; // Mark as no longer new after saving
+        document.getElementById("business-type").disabled = true; // Disable category dropdown
+        document.getElementById("status-label").textContent = updates.isOpen ? "Open" : "Closed";
         showAlert("Business details updated successfully!", true);
-        console.log("Business details updated for:", businessId);
+        console.log("Business details updated for:", businessId, "Type:", businessType || newBusinessType);
       } catch (error) {
         console.error("Error saving business details:", error);
         showAlert("Failed to save business details. Please try again.", false);
@@ -805,8 +1000,13 @@
 
     async function loadMenuItems() {
       try {
-        const menuRef = ref(db, `${businessType}s/${businessId}/menu`);
+        const menuRef = ref(db, `${businessType}/${businessId}/menu`);
         onValue(menuRef, (snapshot) => {
+          const menuItems = document.getElementById("menu-items");
+          if (!menuItems) {
+            console.error("Menu items element not found");
+            return;
+          }
           menuItems.innerHTML = "";
           if (snapshot.exists()) {
             const menuData = snapshot.val();
@@ -826,6 +1026,9 @@
             menuItems.innerHTML = "<p>No menu items found.</p>";
           }
           console.log("Menu items loaded");
+        }, (error) => {
+          console.error("Error in onValue for menu items:", error);
+          showAlert("Failed to load menu items. Please try again.", false);
         });
       } catch (error) {
         console.error("Error loading menu items:", error);
@@ -848,7 +1051,7 @@
           hideSpinner();
           return;
         }
-        const menuRef = ref(db, `${businessType}s/${businessId}/menu`);
+        const menuRef = ref(db, `${businessType}/${businessId}/menu`);
         const newItemRef = push(menuRef);
         await set(newItemRef, { name, price, category });
         document.getElementById("new-item-name").value = "";
@@ -871,6 +1074,7 @@
       }
       showSpinner();
       try {
+        const menuItems = document.getElementById("menu-items");
         const menuItem = menuItems.children[Array.from(menuItems.children).findIndex(el => el.querySelector(`[onclick="updateMenuItem('${itemId}')"]`))];
         const name = menuItem.querySelector("input:nth-child(1)").value.trim();
         const price = parseFloat(menuItem.querySelector("input:nth-child(2)").value);
@@ -880,7 +1084,7 @@
           hideSpinner();
           return;
         }
-        await update(ref(db, `${businessType}s/${businessId}/menu/${itemId}`), { name, price, category });
+        await update(ref(db, `${businessType}/${businessId}/menu/${itemId}`), { name, price, category });
         showAlert("Menu item updated successfully!", true);
         console.log("Menu item updated:", itemId);
       } catch (error) {
@@ -898,7 +1102,7 @@
       }
       showSpinner();
       try {
-        await remove(ref(db, `${businessType}s/${businessId}/menu/${itemId}`));
+        await remove(ref(db, `${businessType}/${businessId}/menu/${itemId}`));
         showAlert("Menu item deleted successfully!", true);
         console.log("Menu item deleted:", itemId);
       } catch (error) {
@@ -913,6 +1117,11 @@
       try {
         const usersRef = ref(db, "users");
         onValue(usersRef, (snapshot) => {
+          const ordersBody = document.getElementById("orders-body");
+          if (!ordersBody) {
+            console.error("Orders body element not found");
+            return;
+          }
           ordersBody.innerHTML = "";
           if (snapshot.exists()) {
             const users = snapshot.val();
@@ -952,6 +1161,9 @@
             ordersBody.innerHTML = `<tr><td colspan="7" class="text-center">No orders found.</td></tr>`;
             console.log("No orders found");
           }
+        }, (error) => {
+          console.error("Error in onValue for orders:", error);
+          showAlert("Failed to load orders. Please try again.", false);
         });
       } catch (error) {
         console.error("Error loading orders:", error);
@@ -996,13 +1208,25 @@
     }
 
     window.switchTab = function(tab) {
-      document.querySelectorAll(".sidebar-tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".business-details, .menu-management, .orders").forEach(c => c.classList.remove("active"));
-      document.querySelector(`.sidebar-tab[onclick="switchTab('${tab}')"]`).classList.add("active");
-      document.getElementById(tab).classList.add("active");
-      currentTab = tab;
-      showAlert(`Switched to ${tab.replace('-', ' ')} view`, true);
-      console.log(`Switched to ${tab} view`);
+      const tabs = document.querySelectorAll(".sidebar-tab");
+      const sections = document.querySelectorAll(".business-details, .menu-management, .orders");
+      if (tabs.length && sections.length) {
+        tabs.forEach(t => t.classList.remove("active"));
+        sections.forEach(c => c.classList.remove("active"));
+        const tabBtn = document.querySelector(`.sidebar-tab[onclick="switchTab('${tab}')"]`);
+        const section = document.getElementById(tab);
+        if (tabBtn && section) {
+          tabBtn.classList.add("active");
+          section.classList.add("active");
+          currentTab = tab;
+          showAlert(`Switched to ${tab.replace('-', ' ')} view`, true);
+          console.log(`Switched to ${tab} view`);
+        } else {
+          console.error(`Tab or section not found for ${tab}`);
+        }
+      } else {
+        console.error("Tabs or sections not found");
+      }
     };
 
     window.toggleTheme = function() {
@@ -1010,25 +1234,35 @@
       const newTheme = currentTheme === 'light' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
-      document.getElementById('theme-icon').innerHTML = newTheme === 'light'
-        ? `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>`
-        : `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>`;
-      if (auth.currentUser) {
-        set(ref(db, `users/${auth.currentUser.uid}/theme`), newTheme);
+      const themeIcon = document.getElementById('theme-icon');
+      if (themeIcon) {
+        themeIcon.innerHTML = newTheme === 'light'
+          ? `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>`
+          : `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>`;
+      }
+      if (auth?.currentUser) {
+        set(ref(db, `users/${auth.currentUser.uid}/theme`), newTheme).catch(error => {
+          console.error("Failed to save theme:", error);
+        });
       }
     };
 
     window.handleSignOut = function() {
-      signOut(auth).then(() => {
-        console.log("User signed out at", new Date().toLocaleString());
-        document.body.classList.add("fade-out");
-        setTimeout(() => {
-          window.location.href = "signup.html";
-        }, 1500);
-      }).catch((error) => {
-        console.error("Sign out failed:", error.code, error.message);
-        showAlert("Failed to sign out. Please try again.", false);
-      });
+      if (auth) {
+        signOut(auth).then(() => {
+          console.log("User signed out at", new Date().toLocaleString());
+          document.body.classList.add("fade-out");
+          setTimeout(() => {
+            window.location.href = "signup.html";
+          }, 1500);
+        }).catch((error) => {
+          console.error("Sign out failed:", error.code || error.message);
+          showAlert("Failed to sign out. Please try again.", false);
+        });
+      } else {
+        console.error("Auth not initialized");
+        showAlert("Authentication not initialized.", false);
+      }
     };
 
     window.saveBusinessDetails = saveBusinessDetails;
@@ -1048,14 +1282,24 @@
       }
     });
 
+    document.getElementById("business-status").addEventListener("change", () => {
+      const statusLabel = document.getElementById("status-label");
+      if (statusLabel) {
+        statusLabel.textContent = document.getElementById("business-status").checked ? "Open" : "Closed";
+      }
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
       console.log("DOMContentLoaded event fired at", new Date().toLocaleString());
       const savedTheme = localStorage.getItem("theme") || "light";
       document.documentElement.setAttribute("data-theme", savedTheme);
-      document.getElementById('theme-icon').innerHTML = savedTheme === 'light'
-        ? `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>`
-        : `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>`;
-      console.log("Initial theme set to:", savedTheme);
+      const themeIcon = document.getElementById('theme-icon');
+      if (themeIcon) {
+        themeIcon.innerHTML = savedTheme === 'light'
+          ? `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>`
+          : `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>`;
+        console.log("Initial theme set to:", savedTheme);
+      }
       initializeFirebase();
     });
   </script>
