@@ -685,7 +685,7 @@
           <h3>Add New Menu Item</h3>
           <div class="menu-item">
             <input type="text" id="new-item-name" placeholder="Item Name" aria-label="New Item Name" required>
-            <input type="number" id="new-item-price" placeholder="Price" aria-label="New Item Price" step="0.01" required>
+            <input type="number" id="new-item-price" placeholder="Price (R)" aria-label="New Item Price" step="0.01" required>
             <input type="text" id="new-item-category" placeholder="Category" aria-label="New Item Category" required>
             <button class="action-btn add-btn" onclick="addMenuItem()" aria-label="Add Menu Item">Add</button>
           </div>
@@ -732,7 +732,7 @@
 
     let app, auth, db;
     let currentTab = 'business-details';
-    let businessId, businessType, isSuspended = false, isNewBusiness = true;
+    let businessId, businessType, isSuspended = false;
 
     // Define available categories (must match customer app)
     const RESTAURANT_CATEGORIES = [
@@ -876,11 +876,10 @@
         }
 
         isSuspended = businessData.status === "suspended";
-        isNewBusiness = !businessData.type; // Business is new if no type is set
         document.getElementById("business-name").value = businessData.name || "";
         const businessTypeSelect = document.getElementById("business-type");
         businessTypeSelect.value = businessData.type || "";
-        businessTypeSelect.disabled = !isNewBusiness || isSuspended; // Disable if not new or suspended
+        businessTypeSelect.disabled = isSuspended; // Disable only if suspended
         document.getElementById("business-status").checked = businessData.isOpen || false;
         document.getElementById("business-status").disabled = isSuspended;
         document.getElementById("status-label").textContent = businessData.isOpen ? "Open" : "Closed";
@@ -897,11 +896,10 @@
         } else {
           document.getElementById("suspension-notice").style.display = "none";
           document.querySelectorAll(".business-details input, .business-details select, .menu-management input, .action-btn").forEach(el => el.disabled = false);
-          document.getElementById("business-type").disabled = !isNewBusiness; // Reapply category restriction
           document.getElementById("business-status").disabled = false;
         }
 
-        console.log("Business details loaded for:", businessId, "Type:", businessType, "New Business:", isNewBusiness);
+        console.log("Business details loaded for:", businessId, "Type:", businessType);
       } catch (error) {
         console.error("Error loading business details:", error);
         showAlert("Failed to load business details. Please try again.", false);
@@ -924,12 +922,6 @@
           return;
         }
 
-        if (!isNewBusiness && newType !== document.getElementById("business-type").value) {
-          showAlert("Category cannot be changed after initial setup.", false);
-          hideSpinner();
-          return;
-        }
-
         const updates = {
           name: document.getElementById("business-name").value.trim(),
           type: newType,
@@ -946,8 +938,8 @@
           return;
         }
 
-        // If business type (restaurants/shops) has changed and is allowed (new business)
-        if (isNewBusiness && newBusinessType !== businessType) {
+        // If business type (restaurants/shops) has changed
+        if (newBusinessType !== businessType) {
           const oldRef = ref(db, `${businessType}/${businessId}`);
           const newRef = ref(db, `${newBusinessType}/${businessId}`);
           const oldSnapshot = await get(oldRef);
@@ -961,8 +953,6 @@
 
         const businessRef = ref(db, `${businessType || newBusinessType}/${businessId}`);
         await update(businessRef, updates);
-        isNewBusiness = false; // Mark as no longer new after saving
-        document.getElementById("business-type").disabled = true; // Disable category dropdown
         document.getElementById("status-label").textContent = updates.isOpen ? "Open" : "Closed";
         showAlert("Business details updated successfully!", true);
         console.log("Business details updated for:", businessId, "Type:", businessType || newBusinessType);
@@ -1015,10 +1005,11 @@
               menuItem.className = "menu-item";
               menuItem.innerHTML = `
                 <input type="text" value="${item.name}" aria-label="Item Name" ${isSuspended ? 'disabled' : ''}>
-                <input type="number" value="${item.price}" step="0.01" aria-label="Item Price" ${isSuspended ? 'disabled' : ''}>
+                <input type="number" value="${item.price.toFixed(2)}" step="0.01" aria-label="Item Price" ${isSuspended ? 'disabled' : ''}>
                 <input type="text" value="${item.category}" aria-label="Item Category" ${isSuspended ? 'disabled' : ''}>
                 <button class="action-btn save-btn" onclick="updateMenuItem('${itemId}')" aria-label="Save ${item.name}" ${isSuspended ? 'disabled' : ''}>Save</button>
                 <button class="action-btn delete-btn" onclick="deleteMenuItem('${itemId}')" aria-label="Delete ${item.name}" ${isSuspended ? 'disabled' : ''}>Delete</button>
+                <span>R${item.price.toFixed(2)}</span>
               `;
               menuItems.appendChild(menuItem);
             });
@@ -1057,7 +1048,7 @@
         document.getElementById("new-item-name").value = "";
         document.getElementById("new-item-price").value = "";
         document.getElementById("new-item-category").value = "";
-        showAlert("Menu item added successfully!", true);
+        showAlert(`Menu item "${name}" added successfully for R${price.toFixed(2)}!`, true);
         console.log("Menu item added:", name);
       } catch (error) {
         console.error("Error adding menu item:", error);
@@ -1085,7 +1076,7 @@
           return;
         }
         await update(ref(db, `${businessType}/${businessId}/menu/${itemId}`), { name, price, category });
-        showAlert("Menu item updated successfully!", true);
+        showAlert(`Menu item "${name}" updated successfully for R${price.toFixed(2)}!`, true);
         console.log("Menu item updated:", itemId);
       } catch (error) {
         console.error("Error updating menu item:", error);
