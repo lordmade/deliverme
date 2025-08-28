@@ -250,7 +250,7 @@
       height: 100%;
     }
 
-    .business-details, .menu-management, .orders {
+    .business-details, .menu-management, .orders, .revenue {
       background: var(--card-background);
       border-radius: 12px;
       padding: 1.5rem;
@@ -261,11 +261,11 @@
       display: none;
     }
 
-    .business-details.active, .menu-management.active, .orders.active {
+    .business-details.active, .menu-management.active, .orders.active, .revenue.active {
       display: block;
     }
 
-    .business-details h2, .menu-management h2, .orders h2 {
+    .business-details h2, .menu-management h2, .orders h2, .revenue h2 {
       font-size: 1.25rem;
       font-weight: 700;
       color: var(--text-dark);
@@ -420,6 +420,33 @@
       text-align: center;
     }
 
+    .revenue-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-orange);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-card p {
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
     @keyframes pulse {
       0%, 100% { transform: scale(1); opacity: 0.8; }
       50% { transform: scale(1.5); opacity: 0.4; }
@@ -444,10 +471,10 @@
         width: 100%;
         margin-bottom: 1rem;
       }
-      .business-details, .menu-management, .orders {
+      .business-details, .menu-management, .orders, .revenue {
         padding: 1rem;
       }
-      .business-details h2, .menu-management h2, .orders h2 {
+      .business-details h2, .menu-management h2, .orders h2, .revenue h2 {
         font-size: 1.1rem;
       }
       th, td {
@@ -487,13 +514,16 @@
       .toggle-switch input[type="checkbox"]:checked::before {
         transform: translateX(18px);
       }
+      .revenue-stats {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 480px) {
       .main-container {
         padding: 0.5rem 0.25rem;
       }
-      .business-details h2, .menu-management h2, .orders h2 {
+      .business-details h2, .menu-management h2, .orders h2, .revenue h2 {
         font-size: 1rem;
       }
       th, td {
@@ -532,7 +562,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .header, .business-details, .menu-management, .orders, .dot, .sidebar, .custom-alert {
+      .header, .business-details, .menu-management, .orders, .revenue, .dot, .sidebar, .custom-alert {
         animation: none;
       }
     }
@@ -558,6 +588,12 @@
           <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
         </svg>
         Orders
+      </button>
+      <button class="sidebar-tab" onclick="switchTab('revenue')">
+        <svg viewBox="0 0 24 24">
+          <path d="M5 9h4v10H5zm6-6h4v16h-4zm6 6h4v10h-4z"/>
+        </svg>
+        Revenue
       </button>
     </div>
     <div class="content">
@@ -706,6 +742,21 @@
             </tr>
           </thead>
           <tbody id="orders-body"></tbody>
+        </table>
+      </div>
+      <div class="revenue" id="revenue">
+        <h2>Revenue Statistics</h2>
+        <div class="revenue-stats" id="revenue-stats"></div>
+        <h2>Customer Orders</h2>
+        <table role="grid">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Orders</th>
+              <th>Total Revenue</th>
+            </tr>
+          </thead>
+          <tbody id="revenue-body"></tbody>
         </table>
       </div>
     </div>
@@ -896,6 +947,7 @@
         } else {
           document.getElementById("suspension-notice").style.display = "none";
           document.querySelectorAll(".business-details input, .business-details select, .menu-management input, .action-btn").forEach(el => el.disabled = false);
+          document.getElementById("business-type").disabled = false; // Enable category dropdown
           document.getElementById("business-status").disabled = false;
         }
 
@@ -1009,7 +1061,6 @@
                 <input type="text" value="${item.category}" aria-label="Item Category" ${isSuspended ? 'disabled' : ''}>
                 <button class="action-btn save-btn" onclick="updateMenuItem('${itemId}')" aria-label="Save ${item.name}" ${isSuspended ? 'disabled' : ''}>Save</button>
                 <button class="action-btn delete-btn" onclick="deleteMenuItem('${itemId}')" aria-label="Delete ${item.name}" ${isSuspended ? 'disabled' : ''}>Delete</button>
-                <span>R${item.price.toFixed(2)}</span>
               `;
               menuItems.appendChild(menuItem);
             });
@@ -1101,6 +1152,82 @@
         showAlert("Failed to delete menu item. Please try again.", false);
       } finally {
         hideSpinner();
+      }
+    }
+
+    async function loadRevenue() {
+      try {
+        const usersRef = ref(db, "users");
+        onValue(usersRef, (snapshot) => {
+          const revenueStats = document.getElementById("revenue-stats");
+          const revenueBody = document.getElementById("revenue-body");
+          if (!revenueStats || !revenueBody) {
+            console.error("Revenue elements not found");
+            return;
+          }
+          revenueBody.innerHTML = "";
+          let totalOrders = 0;
+          let totalRevenue = 0;
+          let customerOrders = {};
+          if (snapshot.exists()) {
+            const users = snapshot.val();
+            Object.entries(users).forEach(([userId, userData]) => {
+              if (userData.cart && userData.cart[businessId]) {
+                const order = userData.cart[businessId];
+                const orderTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                totalOrders++;
+                totalRevenue += orderTotal;
+                if (!customerOrders[userId]) {
+                  customerOrders[userId] = {
+                    email: userData.email || "Unknown",
+                    orders: 0,
+                    totalRevenue: 0
+                  };
+                }
+                customerOrders[userId].orders++;
+                customerOrders[userId].totalRevenue += orderTotal;
+              }
+            });
+            revenueStats.innerHTML = `
+              <div class="stat-card">
+                <h3>${totalOrders}</h3>
+                <p>Total Orders</p>
+              </div>
+              <div class="stat-card">
+                <h3>R${totalRevenue.toFixed(2)}</h3>
+                <p>Total Revenue</p>
+              </div>
+              <div class="stat-card">
+                <h3>R${totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0}</h3>
+                <p>Average Order Value</p>
+              </div>
+              <div class="stat-card">
+                <h3>${Object.keys(customerOrders).length}</h3>
+                <p>Unique Customers</p>
+              </div>
+            `;
+            Object.entries(customerOrders).forEach(([userId, data]) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${data.email}</td>
+                <td>${data.orders}</td>
+                <td>R${data.totalRevenue.toFixed(2)}</td>
+              `;
+              revenueBody.appendChild(row);
+            });
+            console.log("Revenue data loaded");
+          } else {
+            revenueStats.innerHTML = "<p>No revenue data available.</p>";
+            revenueBody.innerHTML = `<tr><td colspan="3" class="text-center">No customer orders.</td></tr>`;
+            console.log("No revenue data found");
+          }
+        }, (error) => {
+          console.error("Error in onValue for revenue:", error);
+          showAlert("Failed to load revenue data. Please try again.", false);
+        });
+      } catch (error) {
+        console.error("Error loading revenue:", error);
+        showAlert("Failed to load revenue data. Please try again.", false);
       }
     }
 
@@ -1200,7 +1327,7 @@
 
     window.switchTab = function(tab) {
       const tabs = document.querySelectorAll(".sidebar-tab");
-      const sections = document.querySelectorAll(".business-details, .menu-management, .orders");
+      const sections = document.querySelectorAll(".business-details, .menu-management, .orders, .revenue");
       if (tabs.length && sections.length) {
         tabs.forEach(t => t.classList.remove("active"));
         sections.forEach(c => c.classList.remove("active"));
@@ -1217,6 +1344,11 @@
         }
       } else {
         console.error("Tabs or sections not found");
+      }
+      if (tab === 'revenue') {
+        loadRevenue();
+      } else if (tab === 'orders') {
+        loadOrders();
       }
     };
 
